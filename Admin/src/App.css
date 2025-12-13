@@ -1,0 +1,45 @@
+.custom-toast-success {
+  background-color: #94dfa6 !important; /* green */
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.custom-toast-error {
+  background-color: #e07e88 !important; /* red */
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.custom-toast-default {
+  background-color: #2b2b2b !important;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.toast-body {
+  font-size: 14px;
+}
+
+
+/* Move the close (X) button to the top-left corner */
+.Toastify__close-button {
+  position: absolute;
+  left: 8px;     /* Push it a bit from the left */
+  top: 8px;      /* Push it a bit from the top */
+  right: auto;   /* Cancel default right positioning */
+}
+
+/* Optional: Resize the close icon */
+.Toastify__close-button > svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rbc-time-content > * > .rbc-timeslot-group {
+  min-height: 60px; /* You can increase this to make it taller */
+}
+
+
