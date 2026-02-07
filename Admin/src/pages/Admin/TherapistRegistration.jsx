@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
 
-const ProfessionalStaffRegistration = () => {
+const RegisterTherapist = () => {
   const { professionalStaffRegistration } = useContext(AdminContext);
 
   const [name, setName] = useState("");
@@ -22,7 +22,10 @@ const ProfessionalStaffRegistration = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="m-auto min-h-[80vh] flex items-center justify-center">
+    <form
+      onSubmit={handleSubmit}
+      className="m-auto min-h-[80vh] flex items-center justify-center"
+    >
       <div className="p-6 border rounded shadow w-full max-w-md text-sm text-black">
         <h2 className="text-xl font-bold mb-4">Register Therapist</h2>
 
@@ -53,7 +56,10 @@ const ProfessionalStaffRegistration = () => {
         </label>
 
         {/* Submit */}
-        <button type="submit" className="w-full bg-beige text-white py-2 rounded">
+        <button
+          type="submit"
+          className="w-full bg-beige text-white py-2 rounded"
+        >
           Register
         </button>
       </div>
@@ -61,4 +67,4 @@ const ProfessionalStaffRegistration = () => {
   );
 };
 
-export default ProfessionalStaffRegistration;
+export default RegisterTherapist;

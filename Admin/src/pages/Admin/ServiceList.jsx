@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import MoveUpOnRender from "../../components/MoveUpOnRender";
 
-const StaffsList = () => {
+const ServiceList = () => {
   const { staffs, aToken, getAllStaffs, changeAvailability, deleteService } =
     useContext(AdminContext);
 
@@ -16,7 +16,7 @@ const StaffsList = () => {
 
   const handleDelete = (staffId) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
-      deleteService(staffId); 
+      deleteService(staffId);
     }
   };
 
@@ -86,4 +86,4 @@ const StaffsList = () => {
   );
 };
 
-export default StaffsList;
+export default ServiceList;

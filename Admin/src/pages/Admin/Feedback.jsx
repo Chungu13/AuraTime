@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import MoveUpOnRender from "../../components/MoveUpOnRender";
 import axios from "axios";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
-const Feedbacks = () => {
+const Feedback = () => {
   const { aToken, getAllFeedbacks } = useContext(AdminContext);
   const [feedbacks, setFeedbacks] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
@@ -16,7 +16,7 @@ const Feedbacks = () => {
           const data = await getAllFeedbacks();
           if (data && Array.isArray(data)) {
             const sorted = data.sort(
-              (a, b) => new Date(b.slotDate) - new Date(a.slotDate)
+              (a, b) => new Date(b.slotDate) - new Date(a.slotDate),
             );
             setFeedbacks(sorted);
           } else {
@@ -49,19 +49,19 @@ const Feedbacks = () => {
           headers: {
             token: aToken,
           },
-        }
+        },
       );
       const updatedStatus = res.data.isApproved;
 
       setFeedbacks((prev) =>
         prev.map((fb) =>
-          fb._id === id ? { ...fb, isApproved: updatedStatus } : fb
-        )
+          fb._id === id ? { ...fb, isApproved: updatedStatus } : fb,
+        ),
       );
 
-      // ✅ Show success toast
+      // Show success toast
       toast.success(
-        updatedStatus ? "Feedback approved" : "Feedback unapproved"
+        updatedStatus ? "Feedback approved" : "Feedback unapproved",
       );
     } catch (err) {
       console.error("Failed to toggle approval:", err);
@@ -87,14 +87,23 @@ const Feedbacks = () => {
                 className="bg-white border rounded-lg shadow-sm p-4 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-black">{fb.name || "Anonymous"}</p>
-                  <p className="text-sm text-black">{formatDate(fb.slotDate)}</p>
+                  <p className="font-semibold text-black">
+                    {fb.name || "Anonymous"}
+                  </p>
+                  <p className="text-sm text-black">
+                    {formatDate(fb.slotDate)}
+                  </p>
                 </div>
 
                 <p className="text-sm text-black mb-1">
                   <span className="font-medium">Rating:</span>{" "}
                   {[...Array(5)].map((_, i) => (
-                    <span key={i} className={i < fb.rating ? "text-yellow-400" : "text-gray-300"}>
+                    <span
+                      key={i}
+                      className={
+                        i < fb.rating ? "text-yellow-400" : "text-gray-300"
+                      }
+                    >
                       ★
                     </span>
                   ))}{" "}
@@ -102,24 +111,30 @@ const Feedbacks = () => {
                 </p>
 
                 <p className="text-sm text-black mb-1">
-                  <span className="font-medium">Email:</span> {fb.email || "N/A"}
+                  <span className="font-medium">Email:</span>{" "}
+                  {fb.email || "N/A"}
                 </p>
 
                 <p className="text-sm text-black mb-1">
-                  <span className="font-medium">Service:</span> {fb.serviceName || "N/A"}
+                  <span className="font-medium">Service:</span>{" "}
+                  {fb.serviceName || "N/A"}
                 </p>
 
                 <p className="text-sm text-black mb-1">
-                  <span className="font-medium">Therapist:</span> {fb.therapistName || "N/A"}
+                  <span className="font-medium">Therapist:</span>{" "}
+                  {fb.therapistName || "N/A"}
                 </p>
 
                 <p className="text-sm text-black mb-1">
-                  <span className="font-medium">Time:</span> {fb.slotTime || "N/A"}
+                  <span className="font-medium">Time:</span>{" "}
+                  {fb.slotTime || "N/A"}
                 </p>
 
                 {fb.image && (
                   <div className="mt-2">
-                    <p className="text-sm text-black font-medium mb-1">Image:</p>
+                    <p className="text-sm text-black font-medium mb-1">
+                      Image:
+                    </p>
                     <img
                       src={fb.image}
                       alt="Feedback Image"
@@ -154,4 +169,4 @@ const Feedbacks = () => {
   );
 };
 
-export default Feedbacks;
+export default Feedback;

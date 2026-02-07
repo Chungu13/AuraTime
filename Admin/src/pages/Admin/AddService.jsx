@@ -3,8 +3,6 @@ import { assets } from "../../assets/assets";
 import { AdminContext } from "../../context/AdminContext";
 import { toast } from "react-toastify";
 
-
-
 import axios from "axios";
 import MoveUpOnRender from "../../components/MoveUpOnRender";
 
@@ -17,11 +15,12 @@ const initialValues = {
   serviceDuration: "",
 };
 
-const AddBusiness = () => {
+const AddService = () => {
   const [docImg, setDocImg] = useState(null);
   const [businessData, setBusinessData] = useState(initialValues);
 
-  const { backendUrl, aToken, getAllProfessionalStaff, professionalStaffs } = useContext(AdminContext);
+  const { backendUrl, aToken, getAllProfessionalStaff, professionalStaffs } =
+    useContext(AdminContext);
 
   useEffect(() => {
     if (Array.isArray(professionalStaffs) && professionalStaffs.length === 0) {
@@ -42,12 +41,16 @@ const AddBusiness = () => {
       const formData = new FormData();
       formData.append("image", docImg);
       Object.entries(businessData).forEach(([key, value]) =>
-        formData.append(key, key === "fees" ? Number(value) : value)
+        formData.append(key, key === "fees" ? Number(value) : value),
       );
 
-      const { data } = await axios.post(`${backendUrl}/api/admin/add-business`, formData, {
-        headers: { aToken },
-      });
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/add-business`,
+        formData,
+        {
+          headers: { aToken },
+        },
+      );
 
       if (data.success) {
         toast.success(data.message);
@@ -64,8 +67,14 @@ const AddBusiness = () => {
 
   return (
     <MoveUpOnRender id="admin-adddoctor">
-      <form onSubmit={handleOnSubmit} className="m-6 max-w-5xl mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center"> Add Business Service</h2>
+      <form
+        onSubmit={handleOnSubmit}
+        className="m-6 max-w-5xl mx-auto px-4 sm:px-6"
+      >
+        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
+          {" "}
+          Add Business Service
+        </h2>
 
         <div className="bg-white p-8 rounded-lg border shadow-md space-y-8">
           {/* Image Upload */}
@@ -73,7 +82,9 @@ const AddBusiness = () => {
             <label htmlFor="doc-img" className="cursor-pointer">
               <img
                 className="w-24 h-24 rounded-full object-cover border border-gray-300 shadow-sm"
-                src={docImg ? URL.createObjectURL(docImg) : assets.pictureupload}
+                src={
+                  docImg ? URL.createObjectURL(docImg) : assets.pictureupload
+                }
                 alt="Upload Preview"
               />
             </label>
@@ -83,13 +94,17 @@ const AddBusiness = () => {
               hidden
               onChange={(e) => setDocImg(e.target.files[0])}
             />
-            <span className="text-gray-700 font-medium">Upload Service Image</span>
+            <span className="text-gray-700 font-medium">
+              Upload Service Image
+            </span>
           </div>
 
           {/* Service Info */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm font-medium text-gray-700">Service Name</label>
+              <label className="text-sm font-medium text-gray-700">
+                Service Name
+              </label>
               <input
                 type="text"
                 name="service_name"
@@ -102,7 +117,9 @@ const AddBusiness = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Fees ($)</label>
+              <label className="text-sm font-medium text-gray-700">
+                Fees ($)
+              </label>
               <input
                 type="number"
                 name="fees"
@@ -115,7 +132,9 @@ const AddBusiness = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Service Type</label>
+              <label className="text-sm font-medium text-gray-700">
+                Service Type
+              </label>
               <select
                 name="speciality"
                 value={businessData.speciality}
@@ -128,7 +147,9 @@ const AddBusiness = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Duration (minutes)</label>
+              <label className="text-sm font-medium text-gray-700">
+                Duration (minutes)
+              </label>
               <input
                 type="text"
                 name="serviceDuration"
@@ -141,7 +162,9 @@ const AddBusiness = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">Address</label>
+              <label className="text-sm font-medium text-gray-700">
+                Address
+              </label>
               <input
                 type="text"
                 name="address"
@@ -156,7 +179,9 @@ const AddBusiness = () => {
 
           {/* About Field */}
           <div>
-            <label className="text-sm font-medium text-gray-700">About This Service</label>
+            <label className="text-sm font-medium text-gray-700">
+              About This Service
+            </label>
             <textarea
               name="about"
               value={businessData.about}
@@ -183,4 +208,4 @@ const AddBusiness = () => {
   );
 };
 
-export default AddBusiness;
+export default AddService;
