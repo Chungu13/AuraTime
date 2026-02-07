@@ -19,38 +19,38 @@ import {
   // getAppointmentsForNextDay,
   // sendReminder,
   updateStaffForAppointment,
-  getNextDayAppointments, 
+  getNextDayAppointments,
   sendReminderEmails,
   getAppointmentsByDate,
   getAvailableStaff
-  
+
 
 } from "../controllers/staffController.js";
 import authStaff from "../middlewares/authStaff.js";
 
 // all staff api
-staffRouter.get("/list", staffList);
+staffRouter.get("/list", authStaff, staffList);
 staffRouter.post("/login", staffLogin);
 staffRouter.get("/appointments", authStaff, appointmentsStaff);
 staffRouter.post("/complete-appointment", authStaff, appointmentComplete);
 staffRouter.post("/cancel-appointment", authStaff, appointmentCancel);
 staffRouter.get("/staff-dashboard", authStaff, staffDashboard);
 staffRouter.get("/staff-profile", authStaff, staffProfile);
-staffRouter.get("/staff-feedbacks", getAllFeedbacks); 
+staffRouter.get("/staff-feedbacks", authStaff, getAllFeedbacks);
 staffRouter.get("/get-business", authStaff, getStaffBusiness);
-staffRouter.post("/updateStaffBusiness", updateStaffBusiness);
-staffRouter.get("/staff-count", getStaffCount);
+staffRouter.post("/updateStaffBusiness", authStaff, updateStaffBusiness);
+staffRouter.get("/staff-count", authStaff, getStaffCount);
 
 staffRouter.get("/all-staffs", authStaff, allStaffs);
 
-staffRouter.post("/create-manual-appointment", manualBooking);
+staffRouter.post("/create-manual-appointment", authStaff, manualBooking);
 
 staffRouter.get("/check-appointments", authStaff, allBookedSolts);
 
 staffRouter.get("/get-all-professional-staff", authStaff, getAllProfessionalStaff);
 
 
-staffRouter.post("/update-staff", authStaff, updateStaffForAppointment );
+staffRouter.post("/update-staff", authStaff, updateStaffForAppointment);
 
 
 // staffRouter.get("/appointments-nextday", authStaff, getAppointmentsForNextDay); // API route
@@ -62,7 +62,7 @@ staffRouter.post("/update-staff", authStaff, updateStaffForAppointment );
 staffRouter.get("/next-day-appointments", getNextDayAppointments);
 
 // Route to send reminder emails
-staffRouter.post("/send-reminders",  sendReminderEmails);
+staffRouter.post("/send-reminders", sendReminderEmails);
 
 staffRouter.post("/appointments-by-date", getAppointmentsByDate);
 

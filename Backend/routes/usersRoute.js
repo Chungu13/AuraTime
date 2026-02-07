@@ -45,7 +45,7 @@ userRouter.post("/create-checkout-session", authUser, createCheckoutSession);
 userRouter.get("/verify-payment", verifyStripePayment);
 
 // routes/userRoutes.js
-userRouter.post("/submit-feedback", upload.single("serviceImage"), submitFeedback);
+userRouter.post("/submit-feedback", upload.single("serviceImage"), authUser, submitFeedback);
 
 
 
@@ -63,7 +63,7 @@ userRouter.get("/approved-feedbacks", getApprovedFeedbacks);
 userRouter.post("/reschedule-appointment", authUser, rescheduleAppointment);  // Add route for rescheduling
 
 
-userRouter.post("/reset-password", forgotPassword );  // Add route for rescheduling
+userRouter.post("/reset-password", forgotPassword);  // Add route for rescheduling
 
 // userRouter.get("/reminders", authUser, getAppointmentsForNextDay); // API route
 

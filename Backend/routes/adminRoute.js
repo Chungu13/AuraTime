@@ -30,12 +30,12 @@ import {
   getAvailableStaff,
   gettherapist,
   getStaffAppointments
-  
- 
+
+
 } from "../controllers/adminController.js";
 import upload from "../middlewares/multer.js";
 import authAdmin from "../middlewares/authAdmin.js";
-import { changeAvailabilty,  deleteStaff } from "../controllers/staffController.js";
+import { changeAvailabilty, deleteStaff } from "../controllers/staffController.js";
 
 const adminRouter = expres.Router();
 
@@ -47,21 +47,21 @@ adminRouter.post("/delete-service", authAdmin, deleteStaff);
 adminRouter.get("/appointments", authAdmin, appointmentsAdmin);
 adminRouter.post("/cancel-appointment", authAdmin, appointmentCancel);
 adminRouter.get("/dashboard", authAdmin, adminDashboard);
-adminRouter.post("/appointments-by-date", getAppointmentsByDate);
-adminRouter.get("/feedbacks", getAllFeedbacks); 
-adminRouter.post("/staff-registration", registerStaff);
+adminRouter.post("/appointments-by-date", authAdmin, getAppointmentsByDate);
+adminRouter.get("/feedbacks", authAdmin, getAllFeedbacks);
+adminRouter.post("/staff-registration", authAdmin, registerStaff);
 //adminRouter.get("/business-users", getAllStaffUsers);
-adminRouter.get("/staff-count", getStaffCount);
+adminRouter.get("/staff-count", authAdmin, getStaffCount);
 adminRouter.post("/register-professional-staff", upload.single("image"), authAdmin, registerProfessionalStaff);
 
 adminRouter.post("/complete-appointment", authAdmin, appointmentComplete);
 
-adminRouter.post("/update-staff", authAdmin, updateStaffForAppointment );
+adminRouter.post("/update-staff", authAdmin, updateStaffForAppointment);
 
 adminRouter.get("/get-all-professional-staff", authAdmin, getAllProfessionalStaff);
 
 
-adminRouter.put("/feedback/approve/:id",  toggleFeedbackApproval);
+adminRouter.put("/feedback/approve/:id", toggleFeedbackApproval);
 
 
 
@@ -90,18 +90,18 @@ adminRouter.post("/delete-professional-staff", authAdmin, deleteProfessionalStaf
 
 adminRouter.post("/delete-professional-staff", authAdmin, deleteProfessionalStaff);
 
-adminRouter.get("/reports", getReports);
+adminRouter.get("/reports", authAdmin, getReports);
 
 adminRouter.get("/generatereports", authAdmin, generateAppointmentReports);
 
-adminRouter.get("/available", getAvailableStaff);
+adminRouter.get("/available", authAdmin, getAvailableStaff);
 
 
 // adminRouter.get("/schedule/:staffName", getStaffScheduleByName);
 
-adminRouter.get("/all-staff", gettherapist,);
+adminRouter.get("/all-staff", authAdmin, gettherapist,);
 
 
-adminRouter.get("/staff-appointments", getStaffAppointments);
+adminRouter.get("/staff-appointments", authAdmin, getStaffAppointments);
 
 export default adminRouter;
