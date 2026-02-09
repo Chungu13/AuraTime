@@ -70,7 +70,7 @@ const ManageAppointments = () => {
     const staffSelection = appointments.reduce((acc, item) => {
       const matchingStaff = professionalStaffs.find(
         (staff) => staff.name === item.staffName,
-      ); // ✏️ compare by name now
+      );
       acc[item._id] = matchingStaff ? matchingStaff.name : "";
       return acc;
     }, {});
@@ -89,6 +89,9 @@ const ManageAppointments = () => {
           });
           const res = await fetch(
             `${import.meta.env.VITE_BACKEND_URL}/api/admin/available?date=${appointment.slotDate}&time=${appointment.slotTime}`,
+            {
+              headers: { atoken: aToken },
+            },
           );
           const data = await res.json();
           result[appointment._id] = data.staff || [];
@@ -104,7 +107,7 @@ const ManageAppointments = () => {
     if (appointments.length > 0) {
       fetchAvailableStaff();
     }
-  }, [appointments]);
+  }, [appointments, professionalStaffs]);
 
   const handleDateChange = async (date) => {
     setSelectedDate(date);
@@ -123,16 +126,35 @@ const ManageAppointments = () => {
       (staff) => staff._id === staffId,
     );
 
+    // Keep track of the appointment details before the move
+    const currentList = selectedDate ? filteredAppointments : appointments;
+    const appointment = currentList.find((a) => a._id === appointmentId);
+
+    if (!appointment) return;
+
+    // Optimistically update selection text
     setSelectedStaffForAppointments((prev) => ({
       ...prev,
       [appointmentId]: selectedStaff?.name || "",
     }));
 
+    // Update staff in database
     await updateStaffForAppointment(appointmentId, staffId);
 
+    // If filtered by date, refresh filtered list to show assigned staff
+    if (selectedDate) {
+      const formatted = selectedDate.toLocaleDateString("en-CA");
+      const apps = await getAppointmentsByDate(formatted);
+      setFilteredAppointments(apps || []);
+    }
+
+    // Refresh available staff for this slot
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/admin/available?date=${filteredAppointments.find((a) => a._id === appointmentId)?.slotDate}&time=${filteredAppointments.find((a) => a._id === appointmentId)?.slotTime}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/available?date=${appointment.slotDate}&time=${appointment.slotTime}`,
+        {
+          headers: { atoken: aToken },
+        },
       );
       const data = await res.json();
       setAvailableStaffsByAppointment((prev) => ({
@@ -151,9 +173,7 @@ const ManageAppointments = () => {
 
   const displayAppointments = (
     selectedDate ? filteredAppointments : appointments
-  )
-    .slice()
-    .reverse();
+  ).slice();
 
   const completedAppointments = displayAppointments.filter(
     (item) => item.isCompleted,

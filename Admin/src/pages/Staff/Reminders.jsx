@@ -4,28 +4,28 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const StaffReminder = () => {
-  const { backendUrl, dtoken } = useContext(StaffContext);
+  const { backendUrl, dToken } = useContext(StaffContext);
   const [appointments, setAppointments] = useState([]);
-  
 
-  // Fetch appointments for the next day when the staff logs in
+
+
   useEffect(() => {
     console.log("useEffect triggered");
-    if (dtoken) {
+    if (dToken) {
       getNextDayAppointments();
     }
-  }, [dtoken]);
+  }, [dToken]);
 
   const getNextDayAppointments = async () => {
     try {
-      console.log("DToken:", dtoken);
+      console.log("DToken:", dToken);
 
       const { data } = await axios.get(`${backendUrl}/api/staff/appointments-nextday`, {
-        headers: { dtoken },
+        headers: { dToken },
       });
 
       if (data.success) {
-        setAppointments(data.appointments); // Set the appointments for the next day
+        setAppointments(data.appointments);
       } else {
         toast.error("No appointments found for tomorrow.");
       }
@@ -41,6 +41,8 @@ const StaffReminder = () => {
     try {
       const { data } = await axios.post(`${backendUrl}/api/staff/send-reminder`, {
         appointmentId,
+      }, {
+        headers: { dToken }
       });
 
       if (data.success) {

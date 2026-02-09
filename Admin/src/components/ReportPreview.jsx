@@ -1,4 +1,4 @@
-// components/ReportPreview.jsx
+
 import React, { forwardRef } from "react";
 
 const ReportPreview = forwardRef(({ trends, insights }, ref) => {

@@ -10,7 +10,6 @@ import {
   getAppointmentsByDate,
   getAllFeedbacks,
   registerStaff,
-  //getAllStaffUsers,
   getStaffCount,
   registerProfessionalStaff,
   getAllProfessionalStaff,
@@ -39,7 +38,7 @@ import { changeAvailabilty, deleteStaff } from "../controllers/staffController.j
 
 const adminRouter = expres.Router();
 
-adminRouter.post("/add-business", authAdmin, upload.single("image"), addBusiness);
+adminRouter.post("/add-service", authAdmin, upload.single("image"), addBusiness);
 adminRouter.post("/login", loginAdmin);
 adminRouter.get("/all-staffs", authAdmin, allStaffs);
 adminRouter.post("/change-availability", authAdmin, changeAvailabilty);
@@ -50,58 +49,24 @@ adminRouter.get("/dashboard", authAdmin, adminDashboard);
 adminRouter.post("/appointments-by-date", authAdmin, getAppointmentsByDate);
 adminRouter.get("/feedbacks", authAdmin, getAllFeedbacks);
 adminRouter.post("/staff-registration", authAdmin, registerStaff);
-//adminRouter.get("/business-users", getAllStaffUsers);
 adminRouter.get("/staff-count", authAdmin, getStaffCount);
-adminRouter.post("/register-professional-staff", upload.single("image"), authAdmin, registerProfessionalStaff);
-
+adminRouter.post("/register-professional-staff", authAdmin, upload.single("image"), registerProfessionalStaff);
 adminRouter.post("/complete-appointment", authAdmin, appointmentComplete);
-
 adminRouter.post("/update-staff", authAdmin, updateStaffForAppointment);
-
 adminRouter.get("/get-all-professional-staff", authAdmin, getAllProfessionalStaff);
-
-
-adminRouter.put("/feedback/approve/:id", toggleFeedbackApproval);
-
-
-
+adminRouter.put("/feedback/approve/:id", authAdmin, toggleFeedbackApproval);
 adminRouter.post("/appointment-trends", authAdmin, getAppointmentTrends);
-
-// Route for Service Popularity
 adminRouter.get("/service-popularity", authAdmin, getServicePopularity);
-
-
-// Route for Revenue Trends
 adminRouter.get("/revenue-trends", authAdmin, getRevenueTrends);
-
-
-
-// Route for Appointment Cancellation Trends
 adminRouter.get("/cancellation-trends", authAdmin, getCancellationTrends);
-
-// Route for Appointment Type Trends (Completed vs Cancelled)
 adminRouter.get("/appointment-type-trends", authAdmin, getAppointmentTypeTrends);
-
 adminRouter.get("/all-front-staffs", authAdmin, getAllFrontStaff);
-
 adminRouter.post("/delete-front-staff", authAdmin, deleteFrontStaff);
-
 adminRouter.post("/delete-professional-staff", authAdmin, deleteProfessionalStaff);
-
-adminRouter.post("/delete-professional-staff", authAdmin, deleteProfessionalStaff);
-
 adminRouter.get("/reports", authAdmin, getReports);
-
 adminRouter.get("/generatereports", authAdmin, generateAppointmentReports);
-
 adminRouter.get("/available", authAdmin, getAvailableStaff);
-
-
-// adminRouter.get("/schedule/:staffName", getStaffScheduleByName);
-
-adminRouter.get("/all-staff", authAdmin, gettherapist,);
-
-
+adminRouter.get("/all-staff", authAdmin, gettherapist);
 adminRouter.get("/staff-appointments", authAdmin, getStaffAppointments);
 
 export default adminRouter;

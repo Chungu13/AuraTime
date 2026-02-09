@@ -12,69 +12,61 @@ const StaffContextProvider = (props) => {
   );
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState([]);
-  const [staffs, setStaffs] = useState([]);   // This was added 
-  
+  const [staffs, setStaffs] = useState([]);
+
   const [businessData, setBusinessData] = useState(null);
 
   const [profileData, setProfileData] = useState(null);
 
   const [bookedTimes, setBookedTimes] = useState([]);
 
-  const [professionalStaffs, setProfessionalStaffs] = useState([]); // Initialize as an empty array
+  const [professionalStaffs, setProfessionalStaffs] = useState([]);
 
   const [nextdayappointments, setnextDayAppointments] = useState([]);
-  
+
 
   const getNextDayAppointments = useCallback(async () => {
-  console.log("📅 Fetching next-day appointments (no date param needed)");
+    console.log("Fetching next-day appointments (no date param needed)");
 
-  try {
-    const { data } = await axios.get(`${backendUrl}/api/staff/next-day-appointments`, {
-      headers: { Authorization: `Bearer ${dToken}` },
-    });
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/staff/next-day-appointments`, {
+        headers: { dToken },
+      });
 
-    if (data.success) {
-      setnextDayAppointments(data.nextdayappointments); // ✅ match backend key
-    } else {
-      console.error("Error: No appointments found");
+      if (data.success) {
+        setnextDayAppointments(data.nextdayappointments);
+      } else {
+        console.error("Error: No appointments found");
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
     }
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-  }
-}, [backendUrl, dToken]);
+  }, [backendUrl, dToken]);
 
 
 
-const sendReminderEmails = useCallback(async () => {
-  try {
-    const { data } = await axios.post(
-      `${backendUrl}/api/staff/send-reminders`,
-      { nextdayappointments },
-      { headers: { Authorization: `Bearer ${dToken}` } }
-    );
+  const sendReminderEmails = useCallback(async () => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/staff/send-reminders`,
+        { nextdayappointments },
+        { headers: { dToken } }
+      );
 
-    if (data.success) {
-      alert("Reminder emails sent successfully");
-    } else {
-      alert("Failed to send reminder emails");
+      if (data.success) {
+        alert("Reminder emails sent successfully");
+      } else {
+        alert("Failed to send reminder emails");
+      }
+    } catch (error) {
+      console.error("Error sending reminder emails:", error);
     }
-  } catch (error) {
-    console.error("Error sending reminder emails:", error);
-  }
-}, [backendUrl, dToken, nextdayappointments]);
+  }, [backendUrl, dToken, nextdayappointments]);
 
 
 
 
-
-
-
-
-
-
-//get business data to profile staff- working 100%
-
-    const getBusinessData = async () => {
+  const getBusinessData = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/staff/get-business`, {
         headers: { dToken },
@@ -82,7 +74,7 @@ const sendReminderEmails = useCallback(async () => {
 
       if (data.success) {
         setBusinessData(data.businessData);
-        setProfileData(data.profileData); // <-- ADD THIS
+        setProfileData(data.profileData);
         console.log("Fetched business data:", data);
       } else {
         console.error("Failed to fetch business data:", data.message);
@@ -97,16 +89,16 @@ const sendReminderEmails = useCallback(async () => {
   const updateStaffForAppointment = async (appointmentId, staffId) => {
     try {
       const response = await axios.post(
-        `${backendUrl}/api/staff/update-staff`, // Your back-end endpoint
+        `${backendUrl}/api/staff/update-staff`,
         { appointmentId, staffId },
         {
-          headers: { dToken }, // Send auth token if required
+          headers: { dToken },
         }
       );
 
       if (response.data.success) {
         toast.success(response.data.message);
-        // You can update the appointment state or refetch appointments if necessary
+        await getAppointments();
       } else {
         toast.error(response.data.message);
       }
@@ -139,43 +131,43 @@ const sendReminderEmails = useCallback(async () => {
     }
   };
 
-  
-  
-  
+
+
+
 
 
 
 
   const completeAppointment = async (appointmentId) => {
-  try {
-    const { data } = await axios.post(
-      backendUrl + "/api/staff/complete-appointment",
-      { appointmentId },
-      { headers: { dToken } }
-    );
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/staff/complete-appointment",
+        { appointmentId },
+        { headers: { dToken } }
+      );
 
-    if (data.success) {
-      toast.success(data.message);
-      getAppointments();
-      getDashData();
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+        getDashData();
+      } else {
+        toast.error(data.message);
+      }
+
+      return data;
+    } catch (error) {
+
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+        return { success: false, message: error.response.data.message };
+      }
+
+
+      const message = "Error completing appointment: " + error.message;
+      toast.error(message);
+      return { success: false, message };
     }
-
-    return data;
-  } catch (error) {
-    // Check if backend sent a custom error message
-    if (error.response && error.response.data && error.response.data.message) {
-      toast.error(error.response.data.message);
-      return { success: false, message: error.response.data.message };
-    }
-
-    // Generic fallback
-    const message = "Error completing appointment: " + error.message;
-    toast.error(message);
-    return { success: false, message };
-  }
-};
+  };
 
 
 
@@ -204,56 +196,56 @@ const sendReminderEmails = useCallback(async () => {
   };
 
 
-  
 
-const getAllStaffs = useCallback(async () => {
-  try {
-    const { data } = await axios.get(backendUrl + "/api/staff/all-staffs", {
-      headers: { dToken },
-    });
 
-    if (data.success) {
-      setStaffs(data.staffs);
-    } else {
-      toast.error(data.message);
+  const getAllStaffs = useCallback(async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/staff/all-staffs", {
+        headers: { dToken },
+      });
+
+      if (data.success) {
+        setStaffs(data.staffs);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Failed to load staffs");
+      console.error(error);
     }
-  } catch (error) {
-    toast.error("Failed to load staffs");
-    console.error(error);
-  }
-}, [backendUrl, dToken]);  // dependencies that don't change often
+  }, [backendUrl, dToken]);
 
 
 
 
- 
 
-  const deleteService = async (staffId) => {  // this was added 
-  try {
-    const { data } = await axios.post(
-      backendUrl + "/api/admin/delete-service", // Make sure the API endpoint is correct
-      { staffId },
-      { headers: { dToken } } // Include admin token for authorization
-    );
 
-    if (data.success) {
-      toast.success(data.message);
-      getAllStaffs(); // Refresh the staff list after deletion
-    } else {
-      toast.error(data.message);
+  const deleteService = async (staffId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/delete-service",
+        { staffId },
+        { headers: { dToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getAllStaffs();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  } catch (error) {
-    toast.error(error.message); // Show error message if the request fails
-  }
-};
+  };
 
 
 
 
 
-  
+
   const getDashData = async () => {
-  try {
+    try {
       const { data } = await axios.get(backendUrl + "/api/staff/staff-dashboard", {
         headers: { dToken },
       });
@@ -265,11 +257,11 @@ const getAllStaffs = useCallback(async () => {
     } catch (error) {
       toast.error(error);
     }
-};
+  };
 
 
 
-const changeAvailability = async (staffId) => {  // this was added 
+  const changeAvailability = async (staffId) => {
     try {
       const { data } = await axios.post(
         backendUrl + "/api/admin/change-availability",
@@ -291,41 +283,45 @@ const changeAvailability = async (staffId) => {  // this was added
 
 
 
-const [staffCount, setStaffCount] = useState(0);
-// Count staff number from Admin
-const fetchStaffCount = async () => {
-  
-  try {
-    const { data } = await axios.get(backendUrl + "/api/admin/staff-count");
-    
-    if (data.success) {
-      setStaffCount(data.staffCount);
+  const [staffCount, setStaffCount] = useState(0);
+
+  const fetchStaffCount = async () => {
+
+    try {
+      const { data } = await axios.get(backendUrl + "/api/staff/staff-count", {
+        headers: { dToken },
+      });
+
+      if (data.success) {
+        setStaffCount(data.staffCount);
+      }
+    } catch (error) {
+      console.error("Error fetching staff count:", error);
     }
-  } catch (error) {
-    console.error("Error fetching staff count:", error);
-  }
-};
+  };
 
 
 
 
 
-  // Staff get all feedbacks
-const getAllFeedbacks = async () => {
-  try {
-    const { data } = await axios.get(backendUrl + "/api/staff/staff-feedbacks");
-    if (data.success) {
-      return data.feedbacks; // return the array directly
-    } else {
-      toast.error(data.message);
+
+  const getAllFeedbacks = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/staff/staff-feedbacks", {
+        headers: { dToken },
+      });
+      if (data.success) {
+        return data.feedbacks;
+      } else {
+        toast.error(data.message);
+        return [];
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to fetch feedbacks");
       return [];
     }
-  } catch (error) {
-    console.error("API Error:", error);
-    toast.error("Failed to fetch feedbacks");
-    return [];
-  }
-};
+  };
 
 
 
@@ -351,83 +347,83 @@ const getAllFeedbacks = async () => {
 
 
 
-  // StaffContext.jsx
-const getBookedTimesForDate = async (slotDate) => {
-  try {
-    const { data } = await axios.get(`${backendUrl}/api/staff/check-appointments`, {
-      params: { slotDate },
-      headers: { dToken },  // Pass the dToken in the headers for authentication
-    });
 
-    if (data.success) {
-      console.log("Booked times:", data.bookedTimes);  // Check the result here
-      setBookedTimes(data.bookedTimes); // Set the booked times
-    } else {
-      toast.error(data.message);
+  const getBookedTimesForDate = async (slotDate) => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/staff/check-appointments`, {
+        params: { slotDate },
+        headers: { dToken },
+      });
+
+      if (data.success) {
+        console.log("Booked times:", data.bookedTimes);
+        setBookedTimes(data.bookedTimes);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Error fetching booked appointments.");
+      console.log(error);
     }
-  } catch (error) {
-    toast.error("Error fetching booked appointments.");
-    console.log(error);
-  }
-};
+  };
 
 
 
 
 
 
-const getAllProfessionalStaff = async () => {
+  const getAllProfessionalStaff = async () => {
     try {
       const { data } = await axios.get(
-        backendUrl + "/api/staff/get-all-professional-staff", // API endpoint to get professional staff
+        backendUrl + "/api/staff/get-all-professional-staff",
         {
           headers: { dToken },
         }
       );
 
       if (data.success) {
-        setProfessionalStaffs(data.staff); // Store the fetched staff in state
-        return data; // Return success response
+        setProfessionalStaffs(data.staff);
+        return data;
       } else {
-        toast.error(data.message); // Show error message
+        toast.error(data.message);
         return { success: false, message: data.message };
       }
     } catch (error) {
       console.error("Error fetching professional staff:", error);
       toast.error("Error fetching professional staff.");
-      return { success: false, message: error.message }; // Return error message if the request fails
+      return { success: false, message: error.message };
     }
-  };  
+  };
 
 
 
 
-  //Get Appointment by Date
- const getAppointmentsByDate = async (slotDate) => {
-  try {
-    const { data } = await axios.post(backendUrl + "/api/staff/appointments-by-date",
-      { slotDate }, // Send in request body
-      { 
-        headers: { 
-          Authorization: `Bearer ${dToken}`,
-          "Content-Type": "application/json" 
-        } 
-      }
-    );
 
-    if (!data.success) throw new Error(data.message);
-    return data.appointments || [];
+  const getAppointmentsByDate = async (slotDate) => {
+    try {
+      const { data } = await axios.post(backendUrl + "/api/staff/appointments-by-date",
+        { slotDate },
+        {
+          headers: {
+            dToken,
+            "Content-Type": "application/json"
+          }
+        }
+      );
 
-  } catch (error) {
-    console.error("Fetch Error:", {
-      status: error.response?.status,
-      message: error.message,
-      response: error.response?.data
-    });
-    toast.error(error.response?.data?.message || "Failed to load appointments");
-    return [];
-  }
-};
+      if (!data.success) throw new Error(data.message);
+      return data.appointments || [];
+
+    } catch (error) {
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.message,
+        response: error.response?.data
+      });
+      toast.error(error.response?.data?.message || "Failed to load appointments");
+      return [];
+    }
+  };
 
 
 
@@ -469,7 +465,7 @@ const getAllProfessionalStaff = async () => {
     nextdayappointments,
     getAppointmentsByDate
 
-    
+
   };
 
   return (

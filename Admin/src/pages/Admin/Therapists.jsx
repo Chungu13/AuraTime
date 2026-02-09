@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { AdminContext } from "../../context/AdminContext";
 
 const Therapists = () => {
+  const { aToken } = useContext(AdminContext);
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/all-staff`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/all-staff`, {
+          headers: { atoken: aToken }
+        });
         if (res.data.success) {
           setStaffList(res.data.staff);
         }
@@ -19,8 +23,10 @@ const Therapists = () => {
       }
     };
 
-    fetchStaff();
-  }, []);
+    if (aToken) {
+      fetchStaff();
+    }
+  }, [aToken]);
 
   if (loading) return <p className="text-center text-gray-500 mt-10">Loading therapists...</p>;
 

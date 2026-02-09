@@ -87,7 +87,7 @@ const Dashboard = () => {
                     <p className="text-gray-500 text-sm">{slotDateFormat(item?.slotDate)}</p>
                   </div>
 
-                  {/* Read-only status badge */}
+
                   {item.cancelled ? (
                     <span className="text-xs bg-red-100 text-red-500 font-semibold px-3 py-1 rounded-full">
                       Cancelled

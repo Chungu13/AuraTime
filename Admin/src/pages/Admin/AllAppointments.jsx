@@ -9,10 +9,10 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import Modal from "react-modal"; 
+import Modal from "react-modal";
 
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; 
+import "react-datepicker/dist/react-datepicker.css";
 
 
 
@@ -40,27 +40,27 @@ const AllAppointments = () => {
   const [filteredAppointments, setFilteredAppointments] = useState([]);
 
 
-  // Add these inside your component, near other useStates:
-const [selectedAppointment, setSelectedAppointment] = useState(null);
-const [modalIsOpen, setModalIsOpen] = useState(false);
 
-const openModal = (appointment) => {
-  setSelectedAppointment(appointment);
-  setModalIsOpen(true);
-};
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
-const closeModal = () => {
-  setModalIsOpen(false);
-  setSelectedAppointment(null);
-};
+  const openModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setModalIsOpen(true);
+  };
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setSelectedAppointment(null);
+  };
+
+  const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
+  });
 
   useEffect(() => {
     if (aToken && !selectedDate) {
@@ -88,63 +88,63 @@ const localizer = dateFnsLocalizer({
   const displayAppointments = selectedDate ? filteredAppointments : appointments;
 
   const events = useMemo(() => {
-  return displayAppointments
-    .map((item) => {
-      const date = new Date(item.slotDate);
-      const [time, modifier] = item.slotTime.split(" ");
-      const [hoursStr, minutesStr] = time.split(":");
+    return displayAppointments
+      .map((item) => {
+        const date = new Date(item.slotDate);
+        const [time, modifier] = item.slotTime.split(" ");
+        const [hoursStr, minutesStr] = time.split(":");
 
-      let hours = parseInt(hoursStr, 10);
-      const minutes = parseInt(minutesStr, 10);
+        let hours = parseInt(hoursStr, 10);
+        const minutes = parseInt(minutesStr, 10);
 
-      if (modifier === "PM" && hours !== 12) hours += 12;
-      if (modifier === "AM" && hours === 12) hours = 0;
+        if (modifier === "PM" && hours !== 12) hours += 12;
+        if (modifier === "AM" && hours === 12) hours = 0;
 
-      const start = new Date(date);
-      start.setHours(hours);
-      start.setMinutes(minutes);
-      start.setSeconds(0);
+        const start = new Date(date);
+        start.setHours(hours);
+        start.setMinutes(minutes);
+        start.setSeconds(0);
 
-      const duration = item.businessData?.serviceDuration || 30; // 💡 this is key
-      const end = new Date(start.getTime() + duration * 60000);  // ⏱ apply actual duration
+        const duration = item.businessData?.serviceDuration || 30; // 💡 this is key
+        const end = new Date(start.getTime() + duration * 60000);  // ⏱ apply actual duration
 
-      return {
-        id: item._id,
-        title: `${item.staffName || "No Staff"} - ${item.businessData?.service_name || "No Service"}`,
-        start,
-        end,
-        resource: item,
-      };
-    })
-    .filter(Boolean);
-}, [displayAppointments]);
+        return {
+          id: item._id,
+          title: `${item.staffName || "No Staff"} - ${item.businessData?.service_name || "No Service"}`,
+          start,
+          end,
+          resource: item,
+        };
+      })
+      .filter(Boolean);
+  }, [displayAppointments]);
 
 
   const eventStyleGetter = (event) => {
-  const { cancelled, isCompleted } = event.resource || {};
-  let backgroundColor = "#598fe6ff"; // blue
-  if (cancelled) backgroundColor = "#d17575ff"; // red
-  else if (isCompleted) backgroundColor = "#5fd8b0ff"; // green
+    const { cancelled, isCompleted } = event.resource || {};
+    let backgroundColor = "#598fe6ff"; // blue
+    if (cancelled) backgroundColor = "#d17575ff"; // red
+    else if (isCompleted) backgroundColor = "#5fd8b0ff"; // green
 
-  return {
-    style: {
-      backgroundColor,
-      color: "#fff",
-      borderRadius: "10px",
-      padding: "8px 10px",
-      fontWeight: "500",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      borderLeft: "5px solid rgba(255,255,255,0.7)",
-    },
+    return {
+      style: {
+        backgroundColor,
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "8px 10px",
+        fontWeight: "500",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        borderLeft: "5px solid rgba(255,255,255,0.7)",
+      },
+    };
   };
-};
 
 
 
 
   const handleSelectEvent = (event) => {
-  openModal(event.resource);
-};
+    openModal(event.resource);
+  };
 
 
   const completedAppointments = displayAppointments.filter((item) => item.isCompleted);
@@ -197,43 +197,43 @@ const localizer = dateFnsLocalizer({
           />
         </div>
 
-       
-<Modal
-  isOpen={modalIsOpen}
-  onRequestClose={closeModal}
-  contentLabel="Appointment Details"
-  style={{
-    content: {
-      top: '20%',
-      left: '20%',
-      right: '20%',
-      bottom: 'auto',
-      borderRadius: '12px',
-      padding: '20px',
-      backgroundColor: '#fff',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    },
-  }}
-  ariaHideApp={false}  
->
-  {selectedAppointment && (
-    <div className="space-y-2">
-      <h2 className="text-xl font-bold text-gray-800 mb-2">Appointment Details</h2>
-      <p><strong>Therapist:</strong> {selectedAppointment.staffName}</p>
-      <p><strong>Client:</strong> {selectedAppointment.userData?.name}</p>
-      <p><strong>Service:</strong> {selectedAppointment.businessData?.service_name}</p>
-      <p><strong>Date:</strong> {new Date(selectedAppointment.slotDate).toDateString()}</p>
-      <p><strong>Time:</strong> {selectedAppointment.slotTime}</p>
-      <p><strong>Duration:</strong> {selectedAppointment.businessData?.serviceDuration}</p>
-      <button
-        onClick={closeModal}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Close
-      </button>
-    </div>
-  )}
-</Modal>
+
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel="Appointment Details"
+          style={{
+            content: {
+              top: '20%',
+              left: '20%',
+              right: '20%',
+              bottom: 'auto',
+              borderRadius: '12px',
+              padding: '20px',
+              backgroundColor: '#fff',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+          }}
+          ariaHideApp={false}
+        >
+          {selectedAppointment && (
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">Appointment Details</h2>
+              <p><strong>Therapist:</strong> {selectedAppointment.staffName}</p>
+              <p><strong>Client:</strong> {selectedAppointment.userData?.name}</p>
+              <p><strong>Service:</strong> {selectedAppointment.businessData?.service_name}</p>
+              <p><strong>Date:</strong> {new Date(selectedAppointment.slotDate).toDateString()}</p>
+              <p><strong>Time:</strong> {selectedAppointment.slotTime}</p>
+              <p><strong>Duration:</strong> {selectedAppointment.businessData?.serviceDuration}</p>
+              <button
+                onClick={closeModal}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </Modal>
       </MoveUpOnRender>
     </div>
   );

@@ -47,7 +47,7 @@ const Feedback = () => {
         {},
         {
           headers: {
-            token: aToken,
+            atoken: aToken,
           },
         },
       );
@@ -59,7 +59,7 @@ const Feedback = () => {
         ),
       );
 
-      // Show success toast
+
       toast.success(
         updatedStatus ? "Feedback approved" : "Feedback unapproved",
       );

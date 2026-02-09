@@ -45,7 +45,7 @@ const AddService = () => {
       );
 
       const { data } = await axios.post(
-        `${backendUrl}/api/admin/add-business`,
+        `${backendUrl}/api/admin/add-service`,
         formData,
         {
           headers: { aToken },

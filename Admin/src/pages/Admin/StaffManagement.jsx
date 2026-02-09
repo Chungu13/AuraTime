@@ -24,10 +24,8 @@ const ManageStaff = () => {
     try {
       if (type === "front") {
         await deleteStaff(id);
-        toast.success("Front desk staff deleted");
       } else {
         await deleteProfessionalStaff(id);
-        toast.success("Therapist deleted");
       }
     } catch (error) {
       toast.error("Failed to delete staff");
@@ -78,7 +76,7 @@ const ManageStaff = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto mt-10 px-5">
-      {/* Page Heading */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <h1 className="text-2xl font-bold text-black">Staff Management</h1>
         <p className="text-sm text-gray-500">
@@ -86,7 +84,7 @@ const ManageStaff = () => {
         </p>
       </div>
 
-      {/* Loading State */}
+
       {isLoading ? (
         <div className="text-center py-16 text-lg text-gray-600">
           Loading staff list...

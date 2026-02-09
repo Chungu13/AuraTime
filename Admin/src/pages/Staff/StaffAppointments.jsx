@@ -38,7 +38,7 @@ const slotDateFormat = (slotDate) => {
     const year = dateObj.getFullYear();
     return `${day} ${month} ${year}`;
   } catch (error) {
-    return slotDate; // fallback for invalid values
+    return slotDate;
   }
 };
 
@@ -70,7 +70,7 @@ const StaffAppointments = () => {
 
 
 
-  
+
   useEffect(() => {
     if (dToken && !selectedDate) {
       getAppointments();
@@ -86,27 +86,27 @@ const StaffAppointments = () => {
 
 
 
-useEffect(() => {
-  const staffSelection = appointments.reduce((acc, item) => {
-    const matchingStaff = professionalStaffs.find(staff => staff.name === item.staffName); // ✏️ compare by name now
-    acc[item._id] = matchingStaff ? matchingStaff.name : "";
-    return acc;
-  }, {});
-  setSelectedStaffForAppointments(staffSelection);
-}, [appointments, professionalStaffs]);
+  useEffect(() => {
+    const staffSelection = appointments.reduce((acc, item) => {
+      const matchingStaff = professionalStaffs.find(staff => staff.name === item.staffName); // ✏️ compare by name now
+      acc[item._id] = matchingStaff ? matchingStaff.name : "";
+      return acc;
+    }, {});
+    setSelectedStaffForAppointments(staffSelection);
+  }, [appointments, professionalStaffs]);
 
 
 
   const handleDateChange = async (date) => {
-  setSelectedDate(date);
-  if (date) {
-    const formatted = date.toLocaleDateString("en-CA"); // <-- fixed
-    const appointments = await getAppointmentsByDate(formatted);
-    setFilteredAppointments(appointments || []);
-  } else {
-    setFilteredAppointments([]);
-  }
-};
+    setSelectedDate(date);
+    if (date) {
+      const formatted = date.toLocaleDateString("en-CA");
+      const appointments = await getAppointmentsByDate(formatted);
+      setFilteredAppointments(appointments || []);
+    } else {
+      setFilteredAppointments([]);
+    }
+  };
 
 
 
@@ -114,47 +114,61 @@ useEffect(() => {
 
 
 
-const handleStaffChange = async (e, appointmentId) => {
-  const staffId = e.target.value;
-  const selectedStaff = professionalStaffs.find(staff => staff._id === staffId);
+  const refreshData = async () => {
+    if (selectedDate) {
+      const formatted = selectedDate.toLocaleDateString("en-CA");
+      const updatedAppointments = await getAppointmentsByDate(formatted);
+      setFilteredAppointments(updatedAppointments || []);
+    } else {
+      getAppointments();
+    }
+  };
 
-  // 1. Update staff mapping for display
-  setSelectedStaffForAppointments(prevState => ({
-    ...prevState,
-    [appointmentId]: selectedStaff?.name || ""
-  }));
+  const handleStaffChange = async (e, appointmentId) => {
+    const staffId = e.target.value;
+    const selectedStaff = professionalStaffs.find(staff => staff._id === staffId);
 
-  // 2. Save to backend
-  await updateStaffForAppointment(appointmentId, staffId);
+    setSelectedStaffForAppointments(prevState => ({
+      ...prevState,
+      [appointmentId]: selectedStaff?.name || ""
+    }));
 
-  // 3. Mark this appointment as "assigned"
-  setStaffAssignedStatus(prevState => ({
-    ...prevState,
-    [appointmentId]: true
-  }));
-};
+    await updateStaffForAppointment(appointmentId, staffId);
+    await refreshData();
+
+    setStaffAssignedStatus(prevState => ({
+      ...prevState,
+      [appointmentId]: true
+    }));
+  };
+
+  const handleCancel = async (id) => {
+    await cancelAppointment(id);
+    await refreshData();
+  };
+
+  const handleComplete = async (id) => {
+    await completeAppointment(id);
+    await refreshData();
+  };
 
 
 
   const displayAppointments = (selectedDate ? filteredAppointments : appointments)
-  .slice()
-  .sort((a, b) => {
-    const dateA = new Date(`${a.slotDate} ${a.slotTime}`);
-    const dateB = new Date(`${b.slotDate} ${b.slotTime}`);
-    return dateB - dateA; // Most recent first
-  });
+    .slice()
+    .sort((a, b) => {
+      const dateA = new Date(`${a.slotDate} ${a.slotTime}`);
+      const dateB = new Date(`${b.slotDate} ${b.slotTime}`);
+      return dateB - dateA;
+    });
 
 
 
-
-  // const totalRevenue = displayAppointments.reduce((total, item) => {
-  //   return !item.cancelled ? total + (item?.businessData?.fees || 0) : total;
-  // }, 0);
 
   const completedAppointments = displayAppointments.filter(item => item.isCompleted);
-const totalRevenue = completedAppointments.reduce((total, item) => {
-  return total + (item?.businessData?.fees || 0);
-}, 0);
+  const totalRevenue = completedAppointments.reduce((total, item) => {
+    return total + (item?.businessData?.fees || 0);
+  }, 0);
 
 
   return (
@@ -172,9 +186,7 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
               dateFormat="yyyy-MM-dd"
               isClearable
             />
-            {/* <p className="text-sm text-green-600 font-medium">
-              Revenue: {currency}{totalRevenue}
-            </p> */}
+
           </div>
         </div>
 
@@ -219,7 +231,7 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
 
                   <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
 
-                  {/* ✅ Safely format slotDate & slotTime */}
+
                   <p>
                     {item.slotDate ? slotDateFormat(item.slotDate) : "No date"},{" "}
                     {item.slotTime || "No time"}
@@ -238,14 +250,16 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
                     </p>
                   </div>
 
-                  {/* Assigned Staff Section
-                  {selectedStaffForAppointments[item._id] ? (
-                    <p className="text-gray-500">{selectedStaffForAppointments[item._id]}</p>
+                  {item.cancelled || item.isCompleted || staffAssignedStatus[item._id] ? (
+                    <p className="text-gray-500">
+                      {selectedStaffForAppointments[item._id] || "Not assigned"}
+                    </p>
                   ) : (
                     <select
                       value={selectedStaffForAppointments[item._id] || ""}
                       onChange={(e) => handleStaffChange(e, item._id)}
                       className="border rounded px-2 py-1 w-28"
+                      disabled={item.cancelled}
                     >
                       <option value="">Select Staff</option>
                       {professionalStaffs.map((staff) => (
@@ -254,52 +268,7 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
                         </option>
                       ))}
                     </select>
-                  )} */}
-
-                  {/* {item.cancelled || item.isCompleted ? (
-  // Show assigned staff name for cancelled or completed
-  <p className="text-gray-500">
-    {selectedStaffForAppointments[item._id] || "Not assigned"}
-  </p>
-) : (
-  // Allow dropdown only if appointment is active
-  <select
-    value={selectedStaffForAppointments[item._id] || ""}
-    onChange={(e) => handleStaffChange(e, item._id)}
-    className="border rounded px-2 py-1 w-28"
-    disabled={item.cancelled} // Disable dropdown if cancelled
-  >
-    <option value="">Select Staff</option>
-    {professionalStaffs.map((staff) => (
-      <option key={staff._id} value={staff._id}>
-        {staff.name}
-      </option>
-    ))}
-  </select>
-)} */}
-
-
-
-
-{item.cancelled || item.isCompleted || staffAssignedStatus[item._id] ? (
-  <p className="text-gray-500">
-    {selectedStaffForAppointments[item._id] || "Not assigned"}
-  </p>
-) : (
-  <select
-    value={selectedStaffForAppointments[item._id] || ""}
-    onChange={(e) => handleStaffChange(e, item._id)}
-    className="border rounded px-2 py-1 w-28"
-    disabled={item.cancelled}
-  >
-    <option value="">Select Staff</option>
-    {professionalStaffs.map((staff) => (
-      <option key={staff._id} value={staff._id}>
-        {staff.name}
-      </option>
-    ))}
-  </select>
-)}
+                  )}
 
 
 
@@ -313,13 +282,13 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
                     ) : (
                       <>
                         <img
-                          onClick={() => cancelAppointment(item._id)}
+                          onClick={() => handleCancel(item._id)}
                           className="w-6 h-6 cursor-pointer"
                           src={assets.xbutton}
                           alt="Cancel"
                         />
                         <img
-                          onClick={() => completeAppointment(item._id)}
+                          onClick={() => handleComplete(item._id)}
                           className="w-6 h-6 cursor-pointer"
                           src={assets.accept}
                           alt="Complete"
@@ -332,7 +301,7 @@ const totalRevenue = completedAppointments.reduce((total, item) => {
             })
           ) : (
             <p className="text-center text-gray-500 py-6">
-              No appointments found for the selected date.
+              No appointments found .
             </p>
           )}
         </div>

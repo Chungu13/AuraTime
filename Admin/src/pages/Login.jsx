@@ -8,7 +8,7 @@ const Login = () => {
   const [state, setState] = useState("BusinessOwner");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 for toggling
+  const [showPassword, setShowPassword] = useState(false);
   const { setAToken, backendUrl } = useContext(AdminContext);
   const { setDToken } = useContext(StaffContext);
 

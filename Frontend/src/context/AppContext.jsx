@@ -18,7 +18,7 @@ const AppContextProvider = (props) => {
   const getStaffsData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/staff/list");
-
+      console.log("data:", data);
       if (data.success) {
         setStaffs(data.staffs);
       }
@@ -44,9 +44,13 @@ const AppContextProvider = (props) => {
       toast.error(error.message);
     }
   };
+
+
   useEffect(() => {
     getStaffsData();
   }, []);
+
+
 
   useEffect(() => {
     if (token) {

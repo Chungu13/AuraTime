@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { Toaster } from "sonner";
 
 import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 import { AppContext } from "./context/AppContext";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./components/Navbar";
@@ -30,7 +31,6 @@ import ManualBookingForm from "./pages/Staff/StaffManualBooking";
 
 import RegisterTherapist from "./pages/Admin/TherapistRegistration.jsx";
 
-i;
 import ManageStaff from "./pages/Admin/StaffManagement.jsx";
 
 import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
@@ -50,10 +50,6 @@ import ManageAppointments from "./pages/Admin/AppointmentManagement.jsx";
 import StaffManageAppointments from "./pages/Staff/StaffManageAppointments.jsx";
 
 import CalendarView from "./pages/Staff/StaffCalendar.jsx";
-
-import "./App.css"; // with the './' if it's in src folder
-import RegisterTherapist from "./pages/Admin/TherapistRegistration.jsx";
-import ManageStaff from "./pages/Admin/StaffManagement.jsx";
 
 const App = () => {
   const { aToken } = useContext(AdminContext);

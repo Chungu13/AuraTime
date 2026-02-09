@@ -14,17 +14,12 @@ const Navbar = () => {
   return (
     // <div className="flex sticky top-0 bg-white/90 z-10 items-center justify-between text-sm py-4 px-6 mb-5 border-b border-b-gray-400">
     <div className="flex sticky top-0 bg-white/90 z-10 items-center justify-between text-sm py-4 px-6 mb-5 border-b border-b-gray-400">
-
-
-
-
-
       <img
-  onClick={() => navigate("/")}
-  className="h-14 cursor-pointer object-contain"
-  src={assets.AURA_TIME2}
-  alt="Logo"
-/>
+        onClick={() => navigate("/")}
+        className="h-14 cursor-pointer object-contain"
+        src={assets.aura_time2}
+        alt="Logo"
+      />
 
       <ul className="hidden md:flex items-start gap-5 font-medium ">
         <NavLink to="/">
@@ -48,14 +43,10 @@ const Navbar = () => {
           <hr className="border-none outline-none h-0.5 bg-beige w-3/5 m-auto hidden" />
         </NavLink>
 
-
-       
         {/* <NavLink to="/Reminder">
           <li className="py-1 ">Reminder</li>
           <hr className="border-none outline-none h-0.5 bg-beige w-3/5 m-auto hidden" />
         </NavLink> */}
-
-        
       </ul>
       <div className="flex items-center gap-4">
         {token && userData ? (
@@ -77,14 +68,12 @@ const Navbar = () => {
                   My Appointment
                 </p>
 
-
                 <p
                   onClick={() => navigate("/my-feedback")}
                   className=" hover:text-black  cursor-pointer"
                 >
                   My Feedback
                 </p>
-
 
                 <p
                   onClick={logout}
@@ -101,7 +90,7 @@ const Navbar = () => {
               onClick={() => navigate("/login")}
               className="bg-beige text-white px-8 py-3 rounded-full font-light hidden md:block"
             >
-              Login 
+              Login
             </button>
           </>
         )}

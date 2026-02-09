@@ -29,43 +29,33 @@ import {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const userRouter = express.Router();
 
-// Auth & Profile Routes
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/get-profile", authUser, getProfile);
 userRouter.post("/update-profile", upload.single("image"), authUser, updateProfile);
-
-// Appointment Routes
 userRouter.post("/book-appointment", authUser, bookAppointment);
 userRouter.get("/appointments", authUser, listAppointment);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
 
-// Stripe Payment Routes
 userRouter.post("/create-checkout-session", authUser, createCheckoutSession);
 userRouter.get("/verify-payment", verifyStripePayment);
 
-// routes/userRoutes.js
+
 userRouter.post("/submit-feedback", upload.single("serviceImage"), authUser, submitFeedback);
 
 
 
+userRouter.get("/appointments/:appointmentId", authUser, fetchAppointmentById);
 
-//userRouter.get('/appointments', fetchExistingAppointment);
-
-userRouter.get("/appointments/:appointmentId", authUser, fetchAppointmentById);  // Add this line for appointment by ID
-
-// In routes/userRoutes.js
 userRouter.get("/approved-feedbacks", getApprovedFeedbacks);
 
 
-// routes/userRoutes.js
-
-userRouter.post("/reschedule-appointment", authUser, rescheduleAppointment);  // Add route for rescheduling
+userRouter.post("/reschedule-appointment", authUser, rescheduleAppointment);
 
 
-userRouter.post("/reset-password", forgotPassword);  // Add route for rescheduling
+userRouter.post("/reset-password", forgotPassword);
 
-// userRouter.get("/reminders", authUser, getAppointmentsForNextDay); // API route
+
 
 
 

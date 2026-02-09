@@ -29,7 +29,7 @@ import {
 import authStaff from "../middlewares/authStaff.js";
 
 // all staff api
-staffRouter.get("/list", authStaff, staffList);
+staffRouter.get("/list", staffList);
 staffRouter.post("/login", staffLogin);
 staffRouter.get("/appointments", authStaff, appointmentsStaff);
 staffRouter.post("/complete-appointment", authStaff, appointmentComplete);
@@ -59,14 +59,14 @@ staffRouter.post("/update-staff", authStaff, updateStaffForAppointment);
 
 
 // Route to fetch appointments for the next day
-staffRouter.get("/next-day-appointments", getNextDayAppointments);
+staffRouter.get("/next-day-appointments", authStaff, getNextDayAppointments);
 
 // Route to send reminder emails
-staffRouter.post("/send-reminders", sendReminderEmails);
+staffRouter.post("/send-reminders", authStaff, sendReminderEmails);
 
-staffRouter.post("/appointments-by-date", getAppointmentsByDate);
+staffRouter.post("/appointments-by-date", authStaff, getAppointmentsByDate);
 
-staffRouter.get("/available", getAvailableStaff);
+staffRouter.get("/available", authStaff, getAvailableStaff);
 
 export default staffRouter;
 

@@ -50,7 +50,8 @@ const Login = () => {
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(errorMessage);
     }
   };
 
@@ -96,24 +97,24 @@ const Login = () => {
         </div>
 
         <div className="w-full relative">
-  <p>Password</p>
-  <input
-    className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
-    type={showPassword ? "text" : "password"}
-    onChange={(e) => setPassword(e.target.value)}
-    value={password}
-    required
-  />
-  {/* Show/hide password toggle */}
-  <span
-    onClick={() => setShowPassword(!showPassword)}
-    className="absolute right-3 top-[40px] cursor-pointer text-gray-500"
-  >
-    {showPassword ? "🙈" : "👁️"}
-  </span>
-</div>
+          <p>Password</p>
+          <input
+            className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
+            type={showPassword ? "text" : "password"}
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            required
+          />
+          {/* Show/hide password toggle */}
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[40px] cursor-pointer text-gray-500"
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
-        
+
 
         <button
           type="submit"

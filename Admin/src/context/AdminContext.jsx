@@ -12,8 +12,8 @@ const AdminContextProvider = (props) => {
   const [staffs, setStaffs] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState([]);
-  
-  const [professionalStaffs, setProfessionalStaffs] = useState([]); 
+
+  const [professionalStaffs, setProfessionalStaffs] = useState([]);
 
   const [appointmentTrends, setAppointmentTrends] = useState([]);
   const [servicePopularity, setServicePopularity] = useState([]);
@@ -22,54 +22,56 @@ const AdminContextProvider = (props) => {
   const [appointmentTypeTrends, setAppointmentTypeTrends] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [frontstaff, setFrontStaffs] = useState([]);
-  
-const [reports, setReports] = useState(null);
 
-const [report, setReport] = useState(null);
+  const [reports, setReports] = useState(null);
+
+  const [report, setReport] = useState(null);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
-  const fetchAnalyticsData = async (startDate,endDate) => {
-  if (isLoading) return;  
+  const fetchAnalyticsData = async (startDate, endDate) => {
+    if (isLoading) return;
 
-  setIsLoading(true);  
-  try {
-    await getAppointmentTrends(startDate, endDate);  
-    await getRevenueTrends(); 
-    await getServicePopularity();  
-    await getCancellationTrends();
-    await getAppointmentTypeTrends();
-    
-  
-    console.log("Appointment Trends:", appointmentTrends);
-    console.log("Revenue Trends:", revenueTrends);
-    console.log("Service Popularity:", servicePopularity);
-    console.log("Canaclation :", cancellationTrends);
-    console.log("Cancel vs Complete:", appointmentTypeTrends);
-
-  } catch (error) {
-    console.error("Error fetching analytics data:", error);
-  } finally {
-    setIsLoading(false);  
-  }
-};
+    setIsLoading(true);
+    try {
+      await getAppointmentTrends(startDate, endDate);
+      await getRevenueTrends();
+      await getServicePopularity();
+      await getCancellationTrends();
+      await getAppointmentTypeTrends();
 
 
-const fetchReports = async () => {
-  try {
-    const res = await axios.get(backendUrl + "/api/admin/reports");
+      console.log("Appointment Trends:", appointmentTrends);
+      console.log("Revenue Trends:", revenueTrends);
+      console.log("Service Popularity:", servicePopularity);
+      console.log("Canaclation :", cancellationTrends);
+      console.log("Cancel vs Complete:", appointmentTypeTrends);
 
-    if (res.data && res.data.data) {
-      console.log("✅ Reports Data:", res.data.data);
-      setReports(res.data.data); 
-    } else {
-      console.error("Unexpected response format:", res.data);
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching reports:", err);
-  }
-};
+  };
+
+
+  const fetchReports = async () => {
+    try {
+      const res = await axios.get(backendUrl + "/api/admin/reports", {
+        headers: { aToken },
+      });
+
+      if (res.data && res.data.data) {
+        console.log("Reports Data:", res.data.data);
+        setReports(res.data.data);
+      } else {
+        console.error("Unexpected response format:", res.data);
+      }
+    } catch (err) {
+      console.error("Error fetching reports:", err);
+    }
+  };
 
 
 
@@ -94,41 +96,43 @@ const fetchReports = async () => {
 
 
   const fetchReport = async () => {
-  try {
-    const { data } = await axios.get(backendUrl + "/api/admin/generatereports", {
-      headers: { aToken },
-    });
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/generatereports", {
+        headers: { aToken },
+      });
 
-    if (data.success) {
-      setReport(data.report);
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        setReport(data.report);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching report:", err);
+      toast.error("Something went wrong while fetching the report.");
     }
-  } catch (err) {
-    console.error("Error fetching report:", err);
-    toast.error("Something went wrong while fetching the report.");
-  }
-};
+  };
 
 
 
 
 
 
-const [staffCount, setStaffCount] = useState(0);
-// Count staff number from Admin
-const fetchStaffCount = async () => {
-  
-  try {
-    const { data } = await axios.get(backendUrl + "/api/admin/staff-count");
-    
-    if (data.success) {
-      setStaffCount(data.staffCount);
+  const [staffCount, setStaffCount] = useState(0);
+
+  const fetchStaffCount = async () => {
+
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/staff-count", {
+        headers: { aToken },
+      });
+
+      if (data.success) {
+        setStaffCount(data.staffCount);
+      }
+    } catch (error) {
+      console.error("Error fetching staff count:", error);
     }
-  } catch (error) {
-    console.error("Error fetching staff count:", error);
-  }
-};
+  };
 
 
 
@@ -154,63 +158,64 @@ const fetchStaffCount = async () => {
 
 
   const deleteService = async (staffId) => {
-  try {
-    const { data } = await axios.post(
-      backendUrl + "/api/admin/delete-service", 
-      { staffId },
-      { headers: { aToken } } 
-    );
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/delete-service",
+        { staffId },
+        { headers: { aToken } }
+      );
 
-    if (data.success) {
-      toast.success(data.message);
-      getAllStaffs(); 
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        toast.success(data.message);
+        getAllStaffs();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  } catch (error) {
-    toast.error(error.message); 
-  }
-};
+  };
 
 
 
-const professionalStaffRegistration = async ({ name, email }) => {
-  try {
-   
-    const { data } = await axios.post(
-      backendUrl + "/api/admin/register-professional-staff", 
-      { name, email}, 
-      { headers: { aToken } }
-    );
+  const professionalStaffRegistration = async ({ name, email }) => {
+    try {
 
-    if (data.success) {
-      toast.success(data.message); 
-      return true; 
-    } else {
-      toast.error(data.message); 
-      return false; 
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/register-professional-staff",
+        { name, email },
+        { headers: { aToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        await getAllProfessionalStaff(); // Refresh the list
+        return true;
+      } else {
+        toast.error(data.message);
+        return false;
+      }
+    } catch (error) {
+      toast.error(error.message);
+      return false;
     }
-  } catch (error) {
-    toast.error(error.message); 
-    return false; 
-  }
-};
+  };
 
 
 
-const updateStaffForAppointment = async (appointmentId, staffId) => {
+  const updateStaffForAppointment = async (appointmentId, staffId) => {
     try {
       const response = await axios.post(
-        `${backendUrl}/api/admin/update-staff`, 
+        `${backendUrl}/api/admin/update-staff`,
         { appointmentId, staffId },
         {
-          headers: { aToken }, 
+          headers: { aToken },
         }
       );
 
       if (response.data.success) {
         toast.success(response.data.message);
-       
+        await getAllAppointments();
       } else {
         toast.error(response.data.message);
       }
@@ -245,17 +250,17 @@ const updateStaffForAppointment = async (appointmentId, staffId) => {
   const getAllProfessionalStaff = async () => {
     try {
       const { data } = await axios.get(
-        backendUrl + "/api/admin/get-all-professional-staff", // API endpoint to get professional staff
+        backendUrl + "/api/admin/get-all-professional-staff",
         {
           headers: { aToken },
         }
       );
 
       if (data.success) {
-        setProfessionalStaffs(data.staff); 
-        return data; // Return success response
+        setProfessionalStaffs(data.staff);
+        return data;
       } else {
-        toast.error(data.message); // Show error message
+        toast.error(data.message);
         return { success: false, message: data.message };
       }
     } catch (error) {
@@ -263,9 +268,9 @@ const updateStaffForAppointment = async (appointmentId, staffId) => {
       toast.error("Error fetching professional staff.");
       return { success: false, message: error.message }; // Return error message if the request fails
     }
-  };  
+  };
 
-  
+
 
 
   const cancelAppointment = async (appointmentId) => {
@@ -294,40 +299,40 @@ const updateStaffForAppointment = async (appointmentId, staffId) => {
 
 
 
-const completeAppointment = async (appointmentId) => {
-  try {
-    const { data } = await axios.post(
-      backendUrl + "/api/admin/complete-appointment",
-      { appointmentId },
-      { headers: { aToken } }
-    );
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/complete-appointment",
+        { appointmentId },
+        { headers: { aToken } }
+      );
 
-    if (data.success) {
-      toast.success(data.message);
-      getAllAppointments();
-      getDashData();
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+        getDashData();
+      } else {
+        toast.error(data.message);
+      }
+
+      return data;
+    } catch (error) {
+      // Check if backend sent a custom error message
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+        return { success: false, message: error.response.data.message };
+      }
+
+      // Generic fallback
+      const message = "Error completing appointment: " + error.message;
+      toast.error(message);
+      return { success: false, message };
     }
-
-    return data;
-  } catch (error) {
-    // Check if backend sent a custom error message
-    if (error.response && error.response.data && error.response.data.message) {
-      toast.error(error.response.data.message);
-      return { success: false, message: error.response.data.message };
-    }
-
-    // Generic fallback
-    const message = "Error completing appointment: " + error.message;
-    toast.error(message);
-    return { success: false, message };
-  }
-};
+  };
 
 
 
-  
+
 
   const getDashData = async () => {
     try {
@@ -348,86 +353,88 @@ const completeAppointment = async (appointmentId) => {
 
 
   // Admin get all feedbacks
-const getAllFeedbacks = async () => {
-  try {
-    const { data } = await axios.get(backendUrl + "/api/admin/feedbacks");
+  const getAllFeedbacks = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/feedbacks", {
+        headers: { aToken },
+      });
 
-    // Log the data received from the backend
-    console.log("Fetched feedbacksssssss data:", data);  // Add this line to log the response
+      // Log the data received from the backend
+      console.log("Fetched feedbacksssssss data:", data);  // Add this line to log the response
 
-    if (data.success) {
-      return data.feedbacks; 
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        return data.feedbacks;
+      } else {
+        toast.error(data.message);
+        return [];
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to fetch feedbacks");
       return [];
     }
-  } catch (error) {
-    console.error("API Error:", error);
-    toast.error("Failed to fetch feedbacks");
-    return [];
-  }
-};
+  };
 
 
 
 
-//admin/staff register 
-const staffRegistration = async (staffData) => {
-  try {
-    const { data } = await axios.post(
-      `${backendUrl}/api/admin/staff-registration`,
-      staffData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          aToken,
-        },
+  //admin/staff register 
+  const staffRegistration = async (staffData) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/staff-registration`,
+        staffData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            aToken,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message || "Staff registered successfully.");
+        getAllStaffs(); // Optional: refresh staff list after registration
+      } else {
+        toast.error(data.message || "Failed to register staff.");
       }
-    );
-
-    if (data.success) {
-      toast.success(data.message || "Staff registered successfully.");
-      getAllStaffs(); // Optional: refresh staff list after registration
-    } else {
-      toast.error(data.message || "Failed to register staff.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Registration error.");
     }
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Registration error.");
-  }
-};
+  };
 
 
 
 
   //Get Appointment by Date
- const getAppointmentsByDate = async (slotDate) => {
-  try {
-    const { data } = await axios.post(backendUrl + "/api/admin/appointments-by-date",
-      { slotDate }, // Send in request body
-      { 
-        headers: { 
-          Authorization: `Bearer ${aToken}`,
-          "Content-Type": "application/json" 
-        } 
-      }
-    );
+  const getAppointmentsByDate = async (slotDate) => {
+    try {
+      const { data } = await axios.post(backendUrl + "/api/admin/appointments-by-date",
+        { slotDate }, // Send in request body
+        {
+          headers: {
+            aToken,
+            "Content-Type": "application/json"
+          }
+        }
+      );
 
-    if (!data.success) throw new Error(data.message);
-    return data.appointments || [];
+      if (!data.success) throw new Error(data.message);
+      return data.appointments || [];
 
-  } catch (error) {
-    console.error("Fetch Error:", {
-      status: error.response?.status,
-      message: error.message,
-      response: error.response?.data
-    });
-    toast.error(error.response?.data?.message || "Failed to load appointments");
-    return [];
-  }
-};
+    } catch (error) {
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.message,
+        response: error.response?.data
+      });
+      toast.error(error.response?.data?.message || "Failed to load appointments");
+      return [];
+    }
+  };
 
 
-// Fetch appointment trends by date range
+  // Fetch appointment trends by date range
   const getAppointmentTrends = async (startDate, endDate) => {
     try {
       const { data } = await axios.post(
@@ -499,7 +506,7 @@ const staffRegistration = async (staffData) => {
 
 
 
-  
+
 
   // Fetch appointment type trends (Completed vs Cancelled)
   const getAppointmentTypeTrends = async () => {
@@ -538,11 +545,11 @@ const staffRegistration = async (staffData) => {
   };
 
 
-  
+
   const deleteStaff = async (staffId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/admin/delete-front-staff", 
+        backendUrl + "/api/admin/delete-front-staff",
         { staffId },
         { headers: { aToken } }
       );
@@ -564,7 +571,7 @@ const staffRegistration = async (staffData) => {
   const deleteProfessionalStaff = async (staffId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/admin/delete-professional-staff", 
+        backendUrl + "/api/admin/delete-professional-staff",
         { staffId },
         { headers: { aToken } }
       );

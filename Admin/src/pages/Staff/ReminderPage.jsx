@@ -4,7 +4,7 @@ import { StaffContext } from "../../context/StaffContext";
 const ReminderPage = () => {
   const {
     dToken,
-    nextdayappointments = [], // safe fallback
+    nextdayappointments = [],
     getNextDayAppointments,
     sendReminderEmails,
   } = useContext(StaffContext);
@@ -12,21 +12,21 @@ const ReminderPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-  const fetchAppointments = async () => {
-    setLoading(true);
-    await getNextDayAppointments();
-    setLoading(false);
-  };
+    const fetchAppointments = async () => {
+      setLoading(true);
+      await getNextDayAppointments();
+      setLoading(false);
+    };
 
- 
-  fetchAppointments();
-}, []);
+
+    fetchAppointments();
+  }, []);
 
 
   const handleSendReminders = async () => {
     setLoading(true);
-    await sendReminderEmails(); 
-    await getNextDayAppointments(); 
+    await sendReminderEmails();
+    await getNextDayAppointments();
     setLoading(false);
   };
 
@@ -62,13 +62,13 @@ const ReminderPage = () => {
                       <span className="text-sm text-gray-500">
                         {appointment.userData?.email} -{" "}
                       </span>
-                     
+
 
                       <span className="text-sm text-gray-500">
-  {appointment.slotTime} -{" "}
-  {new Date(appointment.slotDate).toLocaleDateString()} -{" "}
-  {appointment.businessData?.service_name}
-</span>
+                        {appointment.slotTime} -{" "}
+                        {new Date(appointment.slotDate).toLocaleDateString()} -{" "}
+                        {appointment.businessData?.service_name}
+                      </span>
 
                     </div>
                   </li>
@@ -80,14 +80,10 @@ const ReminderPage = () => {
               <button
                 onClick={handleSendReminders}
                 disabled={nextdayappointments.length === 0}
-                className={`px-6 py-3 text-white rounded-lg shadow-lg focus:outline-none ${
-                  nextdayappointments.length === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-beige hover:bg-white hover:text-black"
-
-                    
-
-                }`}
+                className={`px-6 py-3 text-white rounded-lg shadow-lg focus:outline-none ${nextdayappointments.length === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-beige hover:bg-white hover:text-black"
+                  }`}
               >
                 Send Reminder Emails
               </button>

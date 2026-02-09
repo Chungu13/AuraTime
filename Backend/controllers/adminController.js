@@ -18,8 +18,8 @@ import ProfessionalStaffModel from "../models/ProfessionalStaffModel.js";
 
 const registerStaff = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-
+    const { name, email: rawEmail, password, role } = req.body;
+    const email = rawEmail.toLowerCase();
     // Check for missing fields
     if (!name || !email || !password || !role) {
       return res.status(400).json({ success: false, message: "All fields are required." });
@@ -71,7 +71,7 @@ const registerStaff = async (req, res) => {
 
 const registerProfessionalStaff = async (req, res) => {
   try {
-    const { name, email} = req.body;
+    const { name, email } = req.body;
 
     // ==== VALIDATIONS ====
 
@@ -88,13 +88,13 @@ const registerProfessionalStaff = async (req, res) => {
       return res.status(400).json({ success: false, message: "Therapist with this email already exists." });
     }
 
-    
+
 
     // ✅ Create staff member
     const newStaff = new ProfessionalStaffModel({
       name,
       email,
-      
+
     });
 
     await newStaff.save();
@@ -140,7 +140,7 @@ const getAppointmentsByDate = async (req, res) => {
       });
     }
 
-    
+
     // Build UTC range
     const selectedDate = new Date(`${slotDate}T00:00:00.000Z`);
     const nextDate = new Date(selectedDate);
@@ -299,8 +299,8 @@ const toggleFeedbackApproval = async (req, res) => {
 
 const loginAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
+    const { email: rawEmail, password } = req.body;
+    const email = rawEmail.toLowerCase();
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
@@ -390,13 +390,13 @@ const appointmentCancel = async (req, res) => {
       cancelled: true,
     });
 
-    // releasing STAFF slot
+
     const { staffId, slotDate, slotTime } = appointmentData;
 
     const businessData = await businessModel.findById(staffId);
     let slots_booked = businessData.slots_booked || {};
 
-    // Safely check if the slotDate exists
+
     if (Array.isArray(slots_booked[slotDate])) {
       slots_booked[slotDate] = slots_booked[slotDate].filter(
         (e) => e !== slotTime
@@ -482,7 +482,7 @@ const getAllFeedbacks = async (req, res) => {
   try {
     const feedbacks = await FeedbackModel.find();
 
-    console.log('Fetched feedbacks:', feedbacks); 
+    console.log('Fetched feedbacks:', feedbacks);
 
     // No need to map or populate, just return the feedbacks as is
     res.json({ success: true, feedbacks });
@@ -516,9 +516,9 @@ const updateStaffForAppointment = async (req, res) => {
       return res.status(404).json({ success: false, message: "Staff not found" });
     }
 
-    // 3. Check if the staff is already assigned at the same date and time
+
     const alreadyAssigned = await appointmentModel.findOne({
-      staffId: staffId, // ✅ Match on the correct field
+      staffId: staffId,
       slotDate: appointment.slotDate,
       slotTime: appointment.slotTime,
       _id: { $ne: appointmentId }
@@ -531,9 +531,8 @@ const updateStaffForAppointment = async (req, res) => {
       });
     }
 
-    // 4. Assign both ID and name properly
-    appointment.staffId = staff._id;           // Save ID
-    appointment.staffName = staff.name;        // Save readable name
+    appointment.staffId = staff._id;
+    appointment.staffName = staff.name;
 
     await appointment.save();
 
@@ -562,18 +561,21 @@ export const getAvailableStaff = async (req, res) => {
       return res.status(400).json({ success: false, message: "Date and time are required" });
     }
 
-    // Step 1: Get staff names already booked at that date/time
+    // Convert string date to Date object for robust matching if needed, 
+    // or just match as string if the database contains strings.
+    // However, slotDate is a Date type in the schema.
+    const queryDate = new Date(date);
+
     const bookedAppointments = await appointmentModel.find({
-      slotDate: date,
+      slotDate: queryDate,
       slotTime: time,
       cancelled: false
     });
 
     const bookedStaffNames = bookedAppointments
       .map(app => app.staffName)
-      .filter(name => !!name); // Filter out null/undefined
+      .filter(name => !!name);
 
-    // Step 2: Get available staff (name NOT in booked list)
     const availableStaff = await ProfessionalStaffModel.find({
       name: { $nin: bookedStaffNames }
     });
@@ -591,7 +593,7 @@ export const getAvailableStaff = async (req, res) => {
 
 
 
-//API to get dashboard data for admin panel
+
 
 const adminDashboard = async (req, res) => {
   try {
@@ -682,13 +684,13 @@ const getServicePopularity = async (req, res) => {
 
 
 
-// Get Revenue Trends (Total revenue per day/week/month)
+
 const getRevenueTrends = async (req, res) => {
   try {
     const revenueTrends = await appointmentModel.aggregate([
       {
         $group: {
-          _id: "$slotDate", // Group by slotDate
+          _id: "$slotDate",
           totalRevenue: { $sum: "$amount" },
         },
       },
@@ -712,7 +714,7 @@ const getRevenueTrends = async (req, res) => {
 
 
 
-// Get Cancellation Trends (Number of cancelled appointments per day)
+
 const getCancellationTrends = async (req, res) => {
   try {
     const cancellationTrends = await appointmentModel.aggregate([
@@ -803,14 +805,14 @@ const deleteFrontStaff = async (req, res) => {
     // Check if staff exists
     const staff = await AdminModel.findById(staffId);
     if (!staff) {
-      return res.status(404).json({ success: false, message: "Staff not found" });
+      return res.status(404).json({ success: false, message: "Admin not found" });
     }
 
-    // Delete the staff
+    // Delete the admin
     await AdminModel.findByIdAndDelete(staffId);
-    res.json({ success: true, message: "Staff deleted successfully" });
+    res.json({ success: true, message: "Admin deleted successfully" });
   } catch (error) {
-    console.error("Error deleting staff:", error);
+    console.error("Error deleting admin:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -843,7 +845,7 @@ const deleteProfessionalStaff = async (req, res) => {
 
 
 
- const getReports = async (req, res) => {
+const getReports = async (req, res) => {
   try {
     const appointments = await appointmentModel.find();
 
@@ -911,35 +913,35 @@ const generateAppointmentReports = async (req, res) => {
     const paidAppointments = allAppointments.filter(a => a.payment).length;
 
     const totalEarnings = allAppointments.reduce((sum, a) => {
-  return a.isCompleted ? sum + (a.amount || 0) : sum;
+      return a.isCompleted ? sum + (a.amount || 0) : sum;
     }, 0);
 
 
-  
+
 
 
 
     // Appointments this week (Monday to Sunday)
-const now = new Date();
-const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1)); // Monday
-startOfWeek.setHours(0, 0, 0, 0);
-const endOfWeek = new Date(startOfWeek);
-endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
-endOfWeek.setHours(23, 59, 59, 999);
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1)); // Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+    endOfWeek.setHours(23, 59, 59, 999);
 
-console.log("Start of Week:", startOfWeek.toISOString());
-console.log("End of Week:", endOfWeek.toISOString());
+    console.log("Start of Week:", startOfWeek.toISOString());
+    console.log("End of Week:", endOfWeek.toISOString());
 
-const appointmentsThisWeek = allAppointments.filter(a => {
-  const date = new Date(new Date(a.slotDate).getTime() + 8 * 60 * 60 * 1000); // adjust for GMT+8 if needed
-  console.log("Appointment Date:", date.toISOString());
-  return date >= startOfWeek && date <= endOfWeek;
-}).length;
-
-
+    const appointmentsThisWeek = allAppointments.filter(a => {
+      const date = new Date(new Date(a.slotDate).getTime() + 8 * 60 * 60 * 1000); // adjust for GMT+8 if needed
+      console.log("Appointment Date:", date.toISOString());
+      return date >= startOfWeek && date <= endOfWeek;
+    }).length;
 
 
-  
+
+
+
     // Most booked service
     const serviceCount = {};
     allAppointments.forEach(a => {
@@ -985,7 +987,7 @@ const appointmentsThisWeek = allAppointments.filter(a => {
 
 
 
- const getStaffProfileByName = async (req, res) => {
+const getStaffProfileByName = async (req, res) => {
   try {
     const { staffName } = req.params;
 
@@ -1014,8 +1016,8 @@ const appointmentsThisWeek = allAppointments.filter(a => {
 };
 
 
-// ✅ Get all staff
-const  gettherapist = async (req, res) => {
+
+const gettherapist = async (req, res) => {
   try {
     const staffList = await ProfessionalStaffModel.find();
     res.json({ success: true, staff: staffList });
@@ -1094,8 +1096,8 @@ export {
   getAllProfessionalStaff,
   appointmentComplete,
   updateStaffForAppointment,
-  getAppointmentTrends, 
-  getServicePopularity, 
+  getAppointmentTrends,
+  getServicePopularity,
   getRevenueTrends,
   getCancellationTrends,
   getAppointmentTypeTrends,
@@ -1105,5 +1107,5 @@ export {
   toggleFeedbackApproval,
   getReports,
   generateAppointmentReports
-  
+
 };

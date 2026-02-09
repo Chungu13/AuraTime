@@ -39,7 +39,6 @@ import massage from "./massage.png";
 import makeup from "./makeup.png";
 import medical_dental from "./medical_dental.png";
 
-
 import massage_gving from "./massage_gving.png";
 
 import massage_room from "./massage_room.jpg";
@@ -47,8 +46,6 @@ import massage_room from "./massage_room.jpg";
 import masseuse from "./masseuse.png";
 
 import facial1 from "./facial1.png";
-
-
 
 import user from "./user.png";
 
@@ -58,13 +55,12 @@ import aboutus from "./aboutus.jpg";
 
 import images from "./images.jpg";
 
-import AURA_TIME2 from './AURA_TIME2.PNG'
-
+import aura_time2 from "./aura_time2.png";
 
 export const assets = {
   images,
   aboutus,
- 
+
   profile_pic,
   dropdown_icon,
   cross_icon,
@@ -108,12 +104,10 @@ export const assets = {
   masseuse,
   user,
   team,
-  AURA_TIME2
+  aura_time2,
 };
 
 export const specialityData = [
-  
-  
   {
     speciality: "Facial",
     image: facial1,
@@ -122,10 +116,7 @@ export const specialityData = [
     speciality: "Massage",
     image: massage,
   },
-  
 ];
-
-
 
 // export const staffs = [
 //   {

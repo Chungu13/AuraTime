@@ -22,6 +22,26 @@ const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
+// CORS Config (MUST be before limiter/helmet to handle preflight correctly)
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+  "http://localhost:5173", // Keep localhost for development
+  "http://localhost:5174",
+  "http://localhost:5175"
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
 //middlewares
 app.use(express.json());
 
@@ -43,29 +63,10 @@ app.use(morgan("combined")); // Use 'combined' for standard Apache combined log 
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 app.use("/api", limiter); // Apply to API routes
-
-// CORS Config
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.ADMIN_URL,
-  "http://localhost:5173", // Keep localhost for development
-  "http://localhost:5174"
-].filter(Boolean);
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
 
 //api end points
 app.use("/api/admin", adminRouter);

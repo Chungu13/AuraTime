@@ -30,7 +30,7 @@ const StaffDashboard = () => {
     (dashData || staffCount > 0) && (
       <MoveUpOnRender id="staff-dash">
         <div className="px-6 py-6">
-          {/* === Stats Section === */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
             {/* Appointments */}
             <StatCard

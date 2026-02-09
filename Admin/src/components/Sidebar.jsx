@@ -13,8 +13,7 @@ const Sidebar = () => {
         <ul className="text-[#515151] mt-5">
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] border-r-4 border-beige" : ""
               }`
             }
             to={"/admin-dashboard"}
@@ -26,11 +25,10 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
-            to={"/manage-appointments"}
+            to={"/appointment-management"}
           >
             <img src={assets.serviceList} alt="" />
             <p className="hidden md:block">Appointments & Revenue</p>
@@ -38,8 +36,7 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
             to={"/all-appointments"}
@@ -50,15 +47,14 @@ const Sidebar = () => {
 
 
 
-          
+
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
-            to={"/professional_staff"}
+            to={"/therapist-registration"}
           >
             <img src={assets.adduser} alt="" />
             <p className="hidden md:block">Add Therapist</p>
@@ -67,11 +63,10 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
-            to={"/add-business"}
+            to={"/add-service"}
           >
             <img src={assets.addservice} alt="" />
             <p className="hidden md:block">Add Business Service</p>
@@ -79,11 +74,10 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
-            to={"/staff-list"}
+            to={"/service-list"}
           >
             <img src={assets.serviceList} alt="" />
             <p className="hidden md:block">Service List</p>
@@ -92,8 +86,7 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
             }
             to={"/staff-registration"}
@@ -104,11 +97,10 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
-            }  
-            to={"/feedbacks"}
+            }
+            to={"/feedback"}
           >
             <img src={assets.review} alt="" />
             <p className="hidden md:block"> Customer Feedback</p>
@@ -116,25 +108,23 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
-            }  
-            to={"/all-staff"}
+            }
+            to={"/manage-staff"}
           >
             <img src={assets.staffmanagement} alt="" />
             <p className="hidden md:block"> All Staff Management </p>
           </NavLink>
 
-          
+
 
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black border-r-4 border-beige" : ""
               }`
-            }  
+            }
             to={"/analytic-dashboard"}
           >
             <img src={assets.analyticdashboard} alt="" />
@@ -142,19 +132,18 @@ const Sidebar = () => {
           </NavLink>
 
 
-          
+
 
         </ul>
       )}
 
 
-      
+
       {dToken && (
         <ul className="text-[#515151] mt-5">
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black  py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
               }`
             }
             to={"/staff-dashboard"}
@@ -176,10 +165,9 @@ const Sidebar = () => {
 
 
 
-            <NavLink
+          <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
               }`
             }
             to={"/staff-manage-appointments"}
@@ -191,8 +179,7 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
               }`
             }
             to={"/staff-calendar"}
@@ -205,8 +192,7 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
+              `flex items-center gap-3 text-black py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
               }`
             }
             to={"/booking_page"}
@@ -219,8 +205,7 @@ const Sidebar = () => {
 
           <NavLink
             className={({ isActive }) =>
-              `flex items-center gap-3 py-3.5 text-black  px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
+              `flex items-center gap-3 py-3.5 text-black  px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
               }`
             }
             to={"/ReminderPage"}

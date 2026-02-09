@@ -51,13 +51,13 @@ const StaffProfile = () => {
 
       const { data } = await axios.post(
         `${backendUrl}/api/staff/updateStaffBusiness`,
-        updateData
-        // No headers needed here
+        updateData,
+        { headers: { dToken } }
       );
 
       if (data.success) {
         toast.success(data.message);
-        getBusinessData(); // Refresh updated data
+        getBusinessData();
       } else {
         toast.error(data.message || "Update failed");
       }
@@ -67,7 +67,7 @@ const StaffProfile = () => {
     }
   };
 
-  // Inside your component render or return
+
   if (!Array.isArray(businessData)) {
     return (
       <div className="p-5">
@@ -127,7 +127,7 @@ const StaffProfile = () => {
                 {formStates[index]?.showFullAbout
                   ? business.about
                   : business.about?.split(" ").slice(0, 20).join(" ") +
-                    (business.about?.split(" ").length > 20 ? "..." : "")}
+                  (business.about?.split(" ").length > 20 ? "..." : "")}
                 {business.about?.split(" ").length > 20 && (
                   <button
                     className="text-blue-600 ml-2 text-xs underline"

@@ -34,7 +34,7 @@ const ReportsPage = () => {
     { label: "Earnings", value: `RM ${report?.totalEarnings}`, icon: <DollarSign className="text-yellow-500" /> },
     { label: "Appointments This Week", value: report?.appointmentsThisWeek, icon: <CalendarDays className="text-teal-600" /> },
     { label: "Most Booked Service", value: report?.mostBookedService, icon: <Star className="text-orange-500" /> },
-    // { label: "Online Bookings", value: report?.onlineBookings, icon: <User className="text-pink-600" /> },
+
   ];
 
   const headers = [

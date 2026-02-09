@@ -10,46 +10,37 @@ const ManualBookingForm = () => {
   const [customerContact, setCustomerContact] = useState("");
   const [slotDate, setSlotDate] = useState("");
   const [slotTime, setSlotTime] = useState("");
-  const [serviceName, setServiceName] = useState(""); // Service selection
-  const [amount, setAmount] = useState(""); // Amount selection
-  const [serviceImage, setServiceImage] = useState(""); // New state
+  const [serviceName, setServiceName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [serviceImage, setServiceImage] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
 
 
 
-  // Helper function to format date as 25_6_2025
-  // const formatDate = (date) => {
-  //   const day = date.getDate();
-  //   const month = date.getMonth() + 1; // Month is zero-indexed, so add 1
-  //   const year = date.getFullYear();
-  //   return `${day}_${month}_${year}`;
-  // };
-
-  // ✅ Format to ISO (e.g., "2025-07-15")
-const formatDate = (date) => {
-  return date.toISOString().split("T")[0];
-};
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
+  };
 
 
-  // Generate available times in 30-minute intervals starting from 10:00 AM
+
   const generateAvailableTimes = () => {
     const times = [];
-    let hour = 10; // Start from 10 AM
-    let minute = 0; // Start from 00 minutes
-    let period = "AM"; // Start in AM
+    let hour = 10;
+    let minute = 0;
+    let period = "AM";
 
-    // Generate times in 30-minute intervals
+
     for (let i = 0; i < 16; i++) {
       const timeString = `${hour}:${minute === 0 ? "00" : "30"} ${period}`;
       times.push(timeString);
 
-      // Increase time by 30 minutes
+
       minute = minute === 0 ? 30 : 0;
       if (minute === 0) {
         hour += 1;
       }
 
-      // Switch to PM after 12:00 PM
+
       if (hour >= 12) {
         period = "PM";
       }
@@ -60,20 +51,20 @@ const formatDate = (date) => {
 
   const availableTimes = generateAvailableTimes();
 
-  // Fetch staff on component mount
+
   useEffect(() => {
-    getAllStaffs(); // This will get all the staff when component mounts
+    getAllStaffs();
   }, []);
 
-  // Fetch booked times when slotDate changes
+
   useEffect(() => {
     if (slotDate) {
-      const formattedDate = formatDate(new Date(slotDate)); // Format slotDate before using it
-      getBookedTimesForDate(formattedDate); // Fetch booked times for the selected date
+      const formattedDate = formatDate(new Date(slotDate));
+      getBookedTimesForDate(formattedDate);
     }
   }, [slotDate]);
 
-  // Handle selecting a service and automatically populating the amount
+
   const handleServiceSelect = (e) => {
     const selectedServiceId = e.target.value;
     setServiceName(selectedServiceId);
@@ -81,7 +72,7 @@ const formatDate = (date) => {
     const selectedService = staffs.find(service => service._id === selectedServiceId);
     if (selectedService) {
       setAmount(selectedService.fees);
-      setServiceImage(selectedService.image); // Set image // Assuming `price` is the amount associated with the service
+      setServiceImage(selectedService.image);
     }
   };
 
@@ -90,43 +81,43 @@ const formatDate = (date) => {
     if (bookedTimes.includes(selectedTime)) {
       toast.error("This time slot is already booked.");
     } else {
-      setSlotTime(selectedTime); // Set slot time if it's not booked
+      setSlotTime(selectedTime);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Parse the amount as a number
+
     const parsedAmount = parseFloat(amount);
 
-    // Check if parsedAmount is a valid number
+
     if (isNaN(parsedAmount)) {
       toast.error("Please provide a valid amount.");
       return;
     }
 
-    // Format slotDate before sending to backend
+
     const formattedDate = formatDate(new Date(slotDate));
     const selectedService = staffs.find(service => service._id === serviceName);
     const serviceNameToSend = selectedService ? selectedService.service_name : '';
 
-    
+
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/staff/create-manual-appointment", // API endpoint
+        backendUrl + "/api/staff/create-manual-appointment",
         {
           customerName,
           customerContact,
-          email: customerEmail, // ✅ send email
+          email: customerEmail,
           slotDate: formattedDate,
           slotTime,
           serviceName: serviceNameToSend,
           amount: parsedAmount,
-          image: serviceImage, 
+          image: serviceImage,
         },
         {
-          headers: { Authorization: `Bearer ${dToken}` }, 
+          headers: { dToken },
         }
       );
 
@@ -137,7 +128,7 @@ const formatDate = (date) => {
         setSlotDate("");
         setSlotTime("");
         setAmount("");
-        setServiceName(""); // Reset service selection
+        setServiceName("");
       } else {
         toast.error(data.message);
       }
@@ -147,7 +138,7 @@ const formatDate = (date) => {
     }
   };
 
-  // Filter out booked times from available options
+
   const availableTimeSlots = availableTimes.filter((time) => !bookedTimes.includes(time)); // Remove booked times
 
   return (
@@ -169,17 +160,17 @@ const formatDate = (date) => {
 
 
         {/* Customer Email */}
-<label className="text-sm font-medium text-black">
-  Customer Email:
-  <input
-    type="email"
-    value={customerEmail}
-    onChange={(e) => setCustomerEmail(e.target.value)}
-    required
-    className="mt-2 p-3 border border-gray-300 rounded-md w-full"
-    placeholder="example@gmail.com"
-  />
-</label>
+        <label className="text-sm font-medium text-black">
+          Customer Email:
+          <input
+            type="email"
+            value={customerEmail}
+            onChange={(e) => setCustomerEmail(e.target.value)}
+            required
+            className="mt-2 p-3 border border-gray-300 rounded-md w-full"
+            placeholder="example@gmail.com"
+          />
+        </label>
 
 
         {/* Customer Contact */}
@@ -228,39 +219,36 @@ const formatDate = (date) => {
           )}
         </label>
 
+
         {/* Select Service */}
-        {/* Select Service */}
-<label className="text-sm font-medium text-black">
-  Select Service:
-  <select
-    value={serviceName}
-    onChange={handleServiceSelect}
-    required
-    className="mt-2 p-2 border border-gray-300 rounded-md w-full max-w-xs mx-auto"
-  >
-    <option value="">Select a service</option>
-    {staffs.map((service) => (
-      <option key={service._id} value={service._id}>
-        {service.service_name}
-      </option>
-    ))}
-  </select>
-</label>
+        <label className="text-sm font-medium text-black">
+          Select Service:
+          <select
+            value={serviceName}
+            onChange={handleServiceSelect}
+            required
+            className="mt-2 p-2 border border-gray-300 rounded-md w-full max-w-xs mx-auto"
+          >
+            <option value="">Select a service</option>
+            {staffs.map((service) => (
+              <option key={service._id} value={service._id}>
+                {service.service_name}
+              </option>
+            ))}
+          </select>
+        </label>
 
-{/* Service Image Preview */}
-{serviceImage && (
-  <div className="text-center mt-2">
-    <img
-      src={serviceImage}
-      alt="Selected Service"
-      className="w-32 h-32 object-cover mx-auto rounded border"
-    />
-    <p className="text-xs text-gray-500 mt-1">Service Preview</p>
-  </div>
-)}
-
-
-
+        {/* Service Image Preview */}
+        {serviceImage && (
+          <div className="text-center mt-2">
+            <img
+              src={serviceImage}
+              alt="Selected Service"
+              className="w-32 h-32 object-cover mx-auto rounded border"
+            />
+            <p className="text-xs text-gray-500 mt-1">Service Preview</p>
+          </div>
+        )}
 
 
         {/* Amount */}
