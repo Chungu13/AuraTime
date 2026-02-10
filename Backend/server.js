@@ -28,7 +28,9 @@ const allowedOrigins = [
   process.env.ADMIN_URL,
   "http://localhost:5173", // Keep localhost for development
   "http://localhost:5174",
-  "http://localhost:5175"
+  "http://localhost:5175",
+  "'https://aura-time-blond.vercel.app"
+  
 ].filter(Boolean);
 
 app.use(cors({
