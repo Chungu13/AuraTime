@@ -22,20 +22,22 @@ const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
-// CORS Config (MUST be before limiter/helmet to handle preflight correctly)
+// CORS Config 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
-  "http://localhost:5173", // Keep localhost for development
+  "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
-  "'https://aura-time-blond.vercel.app"
-  
+  "https://aura-time-blond.vercel.app" 
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    // Allow requests with no origin (like mobile apps)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
