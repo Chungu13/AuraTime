@@ -1,10 +1,3 @@
-# AuraTime - Appointment Management System
-
-Welcome to AuraTime! This is a complete solution for managing appointment bookings, featuring a dedicated Admin panel, a customer-facing Frontend, and a robust Backend API.
-
-# AuraTime Appointment Management System
-
-## Overview
 
 # AuraTime - Smart Appointment Management for Beauty & Wellness SMEs
 
