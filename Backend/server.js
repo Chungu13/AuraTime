@@ -38,12 +38,27 @@ const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
+    // Allow localhost
+    if (origin.startsWith("http://localhost")) {
+      return callback(null, true);
     }
+
+    // Allow any vercel deployment of this project
+    if (origin.includes("vercel.app")) {
+      return callback(null, true);
+    }
+
+    // Allow your production frontend
+    if (origin === process.env.FRONTEND_URL) {
+      return callback(null, true);
+    }
+
+    if (origin === process.env.ADMIN_URL) {
+      return callback(null, true);
+    }
+
+    console.log("Blocked by CORS:", origin);
+    callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -51,9 +66,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.options("*", cors(corsOptions));
-
 
 //middlewares
 app.use(express.json());
