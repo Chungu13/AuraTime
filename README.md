@@ -1,5 +1,5 @@
 
-# AuraTime - Smart Appointment Management for Beauty & Wellness SMEs
+# AuraTime - Appointment Management for Beauty & Wellness SMEs
 
 Developed as my final year project, **AuraTime** is a comprehensive appointment management system designed to help small and medium businesses in the beauty and wellness industry transition from manual scheduling to efficient online booking. The platform reduces administrative overhead while improving customer experience through real-time availability tracking and automated management across three role-based portals.
 
@@ -52,23 +52,27 @@ AuraTime is built as a full-stack application with the following components:
 - Stripe Account (for payments)
 
 ## Live Demo
-**[View Live Application](your-frontend-url.vercel.app)**
+**[View Live Application]((https://aura-time-blond.vercel.app/))**
 
 The application is fully deployed and accessible:
-- **Frontend (Customer Portal):** Vercel - [link]
-- **Admin Portal:** Vercel - [link]
-- **Backend API:** Render - [link]
+- **Frontend (Customer Portal):** Vercel - [https://aura-time-blond.vercel.app/]
+- **Admin Portal:** Vercel - [https://aura-time-admin.vercel.app/]
+- **Backend API:** Render - [https://auratime.onrender.com]
 - **Database:** MongoDB Atlas
 
 **Demo Credentials:**
 ```
 Admin Login:
-Email: demo@auratime.com
-Password: Demo123!
+Email: admin@auratime.com
+Password: SuperSecure!1
+
+Staff Login:
+Email: staff@auratime.com
+Password: Passowrd@1234
 
 Customer Login:
-Email: customer@demo.com
-Password: Demo123!
+Email: customer@auratime.com
+Password: Customer@1234!
 ```
 
 ---
@@ -84,8 +88,8 @@ Password: Demo123!
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/yourusername/auratime.git
-cd auratime
+git clone https://github.com/Chungu13/AuraTime.git
+cd AuraTime
 ```
 
 ### 1. Backend Setup
@@ -96,10 +100,7 @@ cd Backend
 npm install
 ```
 
-Create a `.env` file based on the example:
-```bash
-cp .env.example .env
-```
+Create a `.env` file 
 
 Update the `.env` file with your credentials:
 ```env
@@ -117,25 +118,16 @@ Start the server:
 # Development (requires nodemon)
 npm run server
 
-# Production
-node server.js
-
-# Or via PM2 (recommended for production)
-pm2 start server.js --name "auratime-backend"
-```
-
 ### 2. Frontend Setup (Customer Portal)
 
 Navigate to the `Frontend` directory (from project root):
 ```bash
-cd ../Frontend
+cd Frontend
 npm install
 ```
 
 Create a `.env` file:
-```bash
-cp .env.example .env
-```
+
 
 Configure the backend URL:
 ```env
@@ -147,26 +139,17 @@ Start the development server:
 npm run dev
 ```
 
-Build for production:
-```bash
-npm run build
-# Serve the dist folder using a static server
-npx serve -s dist
-# Or use Nginx, Vercel, Netlify, etc.
-```
 
 ### 3. Admin Portal Setup
 
 Navigate to the `Admin` directory (from project root):
 ```bash
-cd ../Admin
+cd Admin
 npm install
 ```
 
 Create a `.env` file:
-```bash
-cp .env.example .env
-```
+
 
 Configure the backend URL:
 ```env
@@ -178,15 +161,11 @@ Start the development server:
 npm run dev
 ```
 
-Build for production:
-```bash
-npm run build
-```
 
 ### 4. Access the Application
 
 Once all services are running:
-- **Customer Portal:** http://localhost:5173 (or your Vite dev port)
+- **Customer Portal:** http://localhost:3000 (or your Vite dev port)
 - **Admin Portal:** http://localhost:5174 (or your Vite dev port)
 - **Backend API:** http://localhost:4000
 
