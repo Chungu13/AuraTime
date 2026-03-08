@@ -2,17 +2,17 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
-const RelatedDoctors = ({ staffId, speciality }) => {
+const RelatedServices = ({ staffId, speciality }) => {
   const { staffs } = useContext(AppContext);
-  const [relDoc, setRelDocs] = useState([]);
+  const [relServices, setRelServices] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (staffs.length > 0 && speciality) {
-      const doctorsData = staffs.filter(
+      const servicesData = staffs.filter(
         (doc) => doc.speciality === speciality && doc._id !== staffId
       );
-      setRelDocs(doctorsData);
+      setRelServices(servicesData);
     }
   }, [staffs, staffId, speciality]);
 
@@ -21,7 +21,7 @@ const RelatedDoctors = ({ staffId, speciality }) => {
       <h1 className="text-3xl font-semibold">Related Services</h1>
 
       <div className="w-full grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-3 sm:px-0 pt-5">
-        {relDoc.slice(0, 5).map((item, index) => (
+        {relServices.slice(0, 5).map((item, index) => (
           <div
             onClick={() => {
               navigate(`/appointment/${item._id}`);
@@ -39,14 +39,12 @@ const RelatedDoctors = ({ staffId, speciality }) => {
             </div>
             <div className="p-4">
               <div
-                className={`flex items-center gap-2 text-sm ${
-                  item.available ? "text-green-500" : "text-gray-500"
-                }`}
+                className={`flex items-center gap-2 text-sm ${item.available ? "text-green-500" : "text-gray-500"
+                  }`}
               >
                 <div
-                  className={`w-2 h-2 rounded-full ${
-                    item.available ? "bg-green-500" : "bg-gray-500"
-                  }`}
+                  className={`w-2 h-2 rounded-full ${item.available ? "bg-green-500" : "bg-gray-500"
+                    }`}
                 ></div>
                 <p>{item.available ? "Available" : "Not Available"}</p>
               </div>
@@ -70,4 +68,4 @@ const RelatedDoctors = ({ staffId, speciality }) => {
   );
 };
 
-export default RelatedDoctors;
+export default RelatedServices;

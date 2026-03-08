@@ -308,20 +308,28 @@ const ManageAppointments = () => {
                         Completed
                       </p>
                     ) : (
-                      <>
-                        <img
-                          onClick={() => cancelAppointment(item._id)}
-                          className="w-6 h-6 cursor-pointer"
-                          src={assets.xbutton}
-                          alt="Cancel"
-                        />
-                        <img
-                          onClick={() => completeAppointment(item._id)}
-                          className="w-6 h-6 cursor-pointer"
-                          src={assets.accept}
-                          alt="Complete"
-                        />
-                      </>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to CANCEL this appointment?")) {
+                              cancelAppointment(item._id);
+                            }
+                          }}
+                          className="px-3 py-1 bg-red-100 text-red-700 font-medium rounded hover:bg-red-200 transition duration-300 w-full sm:w-auto text-xs"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to mark this appointment as COMPLETE?")) {
+                              completeAppointment(item._id);
+                            }
+                          }}
+                          className="px-3 py-1 bg-green-100 text-green-700 font-medium rounded hover:bg-green-200 transition duration-300 w-full sm:w-auto text-xs"
+                        >
+                          Complete
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

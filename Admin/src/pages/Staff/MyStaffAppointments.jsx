@@ -6,25 +6,6 @@ import MoveUpOnRender from "../../components/MoveUpOnRender";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const slotDateFormatter = (slotDate, fallback = "") => {
-  try {
-    if (!slotDate) return fallback;
-    if (slotDate.includes("_")) {
-      const [day, month, year] = slotDate.split("_");
-      return `${day}/${month}/${year}`;
-    }
-    const dateObj = new Date(slotDate);
-    if (!isNaN(dateObj)) {
-      return dateObj.toLocaleDateString();
-    }
-    return fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-
-
 
 const slotDateFormat = (slotDate) => {
   try {
@@ -42,14 +23,7 @@ const slotDateFormat = (slotDate) => {
   }
 };
 
-const formatDateToSlotDate = (date) => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  return `${day}_${month}_${year}`;
-};
-
-const StaffAppointments = () => {
+const StaffManageAppointments = () => {
   const {
     dToken,
     appointments,
@@ -62,14 +36,12 @@ const StaffAppointments = () => {
     updateStaffForAppointment,
   } = useContext(StaffContext);
 
-  const { calculateAge, currency } = useContext(AppContext);
+  const { currency, calculateAge } = useContext(AppContext);
   const [selectedDate, setSelectedDate] = useState(null);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [selectedStaffForAppointments, setSelectedStaffForAppointments] = useState({});
   const [staffAssignedStatus, setStaffAssignedStatus] = useState({});
-
-
-
+  const [availableStaffsByAppointment, setAvailableStaffsByAppointment] = useState({});
 
   useEffect(() => {
     if (dToken && !selectedDate) {
@@ -85,7 +57,6 @@ const StaffAppointments = () => {
 
 
 
-
   useEffect(() => {
     const staffSelection = appointments.reduce((acc, item) => {
       const matchingStaff = professionalStaffs.find(staff => staff.name === item.staffName); // ✏️ compare by name now
@@ -95,6 +66,42 @@ const StaffAppointments = () => {
     setSelectedStaffForAppointments(staffSelection);
   }, [appointments, professionalStaffs]);
 
+
+
+
+  useEffect(() => {
+    const fetchAvailableStaff = async () => {
+      const result = {};
+
+      for (const appointment of appointments) {
+        try {
+
+          console.log("📤 Fetching service for:", appointment._id, {
+            slotDate: appointment.slotDate,
+            slotTime: appointment.slotTime
+          });
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/staff/available?date=${appointment.slotDate}&time=${appointment.slotTime}&duration=${appointment.businessData?.serviceDuration || 30}`,
+            {
+              headers: { dtoken: dToken },
+            }
+          );
+
+          const data = await res.json();
+          result[appointment._id] = data.staff || [];
+        } catch (err) {
+          console.error("Error fetching available service:", err);
+          result[appointment._id] = [];
+        }
+      }
+
+      setAvailableStaffsByAppointment(result);
+    };
+
+    if (appointments.length > 0) {
+      fetchAvailableStaff();
+    }
+  }, [appointments, professionalStaffs, dToken]);
 
 
   const handleDateChange = async (date) => {
@@ -109,59 +116,62 @@ const StaffAppointments = () => {
   };
 
 
-
-
-
-
-
-  const refreshData = async () => {
-    if (selectedDate) {
-      const formatted = selectedDate.toLocaleDateString("en-CA");
-      const updatedAppointments = await getAppointmentsByDate(formatted);
-      setFilteredAppointments(updatedAppointments || []);
-    } else {
-      getAppointments();
-    }
-  };
-
   const handleStaffChange = async (e, appointmentId) => {
     const staffId = e.target.value;
-    const selectedStaff = professionalStaffs.find(staff => staff._id === staffId);
+    const selectedStaff = professionalStaffs.find(
+      (staff) => staff._id === staffId,
+    );
 
-    setSelectedStaffForAppointments(prevState => ({
-      ...prevState,
-      [appointmentId]: selectedStaff?.name || ""
+    // Keep track of the appointment details before the move
+    const currentList = selectedDate ? filteredAppointments : appointments;
+    const appointment = currentList.find((a) => a._id === appointmentId);
+
+    if (!appointment) return;
+
+    // Optimistically update selection text
+    setSelectedStaffForAppointments((prev) => ({
+      ...prev,
+      [appointmentId]: selectedStaff?.name || "",
     }));
 
+    // Update staff in database
     await updateStaffForAppointment(appointmentId, staffId);
-    await refreshData();
 
-    setStaffAssignedStatus(prevState => ({
-      ...prevState,
-      [appointmentId]: true
+    // If filtered by date, refresh filtered list to show assigned staff immediately
+    if (selectedDate) {
+      const formatted = selectedDate.toLocaleDateString("en-CA");
+      const apps = await getAppointmentsByDate(formatted);
+      setFilteredAppointments(apps || []);
+    }
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/staff/available?date=${appointment.slotDate}&time=${appointment.slotTime}`,
+        {
+          headers: { dtoken: dToken },
+        },
+      );
+      const data = await res.json();
+      setAvailableStaffsByAppointment((prev) => ({
+        ...prev,
+        [appointmentId]: data.staff || [],
+      }));
+    } catch (err) {
+      console.error("Failed to refresh available staff:", err);
+    }
+
+    setStaffAssignedStatus((prev) => ({
+      ...prev,
+      [appointmentId]: true,
     }));
   };
 
-  const handleCancel = async (id) => {
-    await cancelAppointment(id);
-    await refreshData();
-  };
-
-  const handleComplete = async (id) => {
-    await completeAppointment(id);
-    await refreshData();
-  };
 
 
 
-  const displayAppointments = (selectedDate ? filteredAppointments : appointments)
-    .slice()
-    .sort((a, b) => {
-      const dateA = new Date(`${a.slotDate} ${a.slotTime}`);
-      const dateB = new Date(`${b.slotDate} ${b.slotTime}`);
-      return dateB - dateA;
-    });
 
+
+  const displayAppointments = (selectedDate ? filteredAppointments : appointments).slice().reverse();
 
 
 
@@ -175,7 +185,7 @@ const StaffAppointments = () => {
     <div className="w-full max-w-7xl m-5">
       <MoveUpOnRender id="admin-allappointment">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-          <p className="text-lg font-medium">All Appointments</p>
+          <p className="text-lg font-medium text-black">All Appointments</p>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <DatePicker
@@ -186,7 +196,9 @@ const StaffAppointments = () => {
               dateFormat="yyyy-MM-dd"
               isClearable
             />
-
+            <p className="text-sm text-green-600 font-medium">
+              Revenue: {currency}{totalRevenue}
+            </p>
           </div>
         </div>
 
@@ -196,6 +208,7 @@ const StaffAppointments = () => {
             <strong>{selectedDate.toDateString()}</strong>
           </p>
         )}
+
 
         <div className="bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
           <div className="hidden sm:grid grid-cols-[0.5fr_2fr_0.8fr_2fr_3fr_2fr_1fr_1fr] items-center py-3 px-6 border-b font-medium text-black bg-gray-50">
@@ -250,7 +263,10 @@ const StaffAppointments = () => {
                     </p>
                   </div>
 
-                  {item.cancelled || item.isCompleted || staffAssignedStatus[item._id] ? (
+
+
+
+                  {item.cancelled || item.isCompleted || item.staffName ? (
                     <p className="text-gray-500">
                       {selectedStaffForAppointments[item._id] || "Not assigned"}
                     </p>
@@ -262,15 +278,13 @@ const StaffAppointments = () => {
                       disabled={item.cancelled}
                     >
                       <option value="">Select Staff</option>
-                      {professionalStaffs.map((staff) => (
+                      {(availableStaffsByAppointment[item._id] || []).map((staff) => (
                         <option key={staff._id} value={staff._id}>
                           {staff.name}
                         </option>
                       ))}
                     </select>
                   )}
-
-
 
                   <p>{currency}{item?.businessData?.fees}</p>
 
@@ -280,20 +294,28 @@ const StaffAppointments = () => {
                     ) : item.isCompleted ? (
                       <p className="text-green-500 text-xs font-medium">Completed</p>
                     ) : (
-                      <>
-                        <img
-                          onClick={() => handleCancel(item._id)}
-                          className="w-6 h-6 cursor-pointer"
-                          src={assets.xbutton}
-                          alt="Cancel"
-                        />
-                        <img
-                          onClick={() => handleComplete(item._id)}
-                          className="w-6 h-6 cursor-pointer"
-                          src={assets.accept}
-                          alt="Complete"
-                        />
-                      </>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to CANCEL this appointment?")) {
+                              cancelAppointment(item._id);
+                            }
+                          }}
+                          className="px-3 py-1 bg-red-100 text-red-700 font-medium rounded hover:bg-red-200 transition duration-300 w-full sm:w-auto text-xs"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to mark this appointment as COMPLETE?")) {
+                              completeAppointment(item._id);
+                            }
+                          }}
+                          className="px-3 py-1 bg-green-100 text-green-700 font-medium rounded hover:bg-green-200 transition duration-300 w-full sm:w-auto text-xs"
+                        >
+                          Complete
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -301,7 +323,7 @@ const StaffAppointments = () => {
             })
           ) : (
             <p className="text-center text-gray-500 py-6">
-              No appointments found .
+              No appointments found.
             </p>
           )}
         </div>
@@ -310,4 +332,4 @@ const StaffAppointments = () => {
   );
 };
 
-export default StaffAppointments;  
+export default StaffManageAppointments;   

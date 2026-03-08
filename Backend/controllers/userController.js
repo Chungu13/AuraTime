@@ -380,16 +380,13 @@ const bookAppointment = async (req, res) => {
 
     let slots_booked = businessData.slots_booked || {};
 
-    // ✅ Utility to format date keys
     const getDateKey = (dateStr) => {
       const date = new Date(dateStr);
-      return date.toISOString().split("T")[0]; // e.g. "2025-07-06"
+      return date.toISOString().split("T")[0];
     };
 
-    // ✅ Normalize the date key for slot tracking
     const dateKey = getDateKey(slotDate);
 
-    // ✅ Check and update the slots_booked object
     if (slots_booked[dateKey]) {
       if (slots_booked[dateKey].includes(slotTime)) {
         return res.json({
@@ -404,7 +401,7 @@ const bookAppointment = async (req, res) => {
     }
 
     const userData = await userModel.findById(userId).select("-password");
-    delete businessData.slots_booked; // clean unnecessary large data
+    delete businessData.slots_booked;
 
     const appointmentData = {
       userId,
@@ -413,18 +410,65 @@ const bookAppointment = async (req, res) => {
       businessData,
       amount: businessData.fees,
       slotTime,
-      slotDate: new Date(`${slotDate}T00:00:00.000Z`), // Always start-of-day UTC
-      // ✅ Save as Date object
-      date: Date.now(), // bookedAt
+      slotDate: new Date(`${slotDate}T00:00:00.000Z`),
+      date: Date.now(),
+      payment: false, // Must be paid to be valid
     };
 
     const newAppointment = new appointmentModel(appointmentData);
     await newAppointment.save();
-
-    // ✅ Save updated booked slots to business model
     await businessModel.findByIdAndUpdate(staffId, { slots_booked });
 
-    res.json({ success: true, message: "Appointment Booked" });
+    // ✅ Generate Stripe Session URL
+    const amountInCents = Math.round(businessData.fees * 100);
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `AuraTime - ${businessData.service_name}`,
+            },
+            unit_amount: amountInCents,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${newAppointment._id}`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      metadata: {
+        appointmentId: newAppointment._id.toString(),
+        userId: userId.toString(),
+      },
+    });
+
+    // ✅ Automated cleanup: If not paid within 10 minutes, cancel and release slot
+    setTimeout(async () => {
+      try {
+        const checkApp = await appointmentModel.findById(newAppointment._id);
+        if (checkApp && !checkApp.payment) {
+          console.log("⏰ 10m Cleanup: Cancelling unpaid appointment:", newAppointment._id);
+
+          await appointmentModel.findByIdAndUpdate(newAppointment._id, { cancelled: true });
+
+          const busData = await businessModel.findById(staffId);
+          if (busData) {
+            let sb = busData.slots_booked || {};
+            if (sb[dateKey]) {
+              sb[dateKey] = sb[dateKey].filter(e => e !== slotTime);
+              await businessModel.findByIdAndUpdate(staffId, { slots_booked: sb });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Cleanup error:", err);
+      }
+    }, 10 * 60 * 1000);
+
+    res.json({ success: true, message: "Checkout URL generated", url: session.url });
+
   } catch (error) {
     console.log("error:", error);
     res.json({ success: false, message: error.message });

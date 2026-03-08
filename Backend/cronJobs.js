@@ -52,7 +52,7 @@ export const initCronJobs = () => {
                     subject: "Aura Time: Upcoming Appointment Reminder",
                     text: `Hello ${appointment.userData.name},
 
-This is an automated friendly reminder that you have an appointment for **${appointment.serviceData.service_name}** scheduled for **tomorrow at ${appointment.slotTime}**.
+This is an automated friendly reminder that you have an appointment for **${appointment.businessData?.service_name || "a session"}** scheduled for tomorrow at ${appointment.slotTime}.
 
 Please try to arrive 10 minutes early to ensure a perfectly smooth experience!
 

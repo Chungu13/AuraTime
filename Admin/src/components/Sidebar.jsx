@@ -42,12 +42,8 @@ const Sidebar = () => {
             to={"/all-appointments"}
           >
             <img src={assets.Date} alt="" />
-            <p className="hidden md:block">Calendar</p>
+            <p className="hidden md:block">Admin Calendar</p>
           </NavLink>
-
-
-
-
 
           <NavLink
             className={({ isActive }) =>
@@ -69,7 +65,7 @@ const Sidebar = () => {
             to={"/add-service"}
           >
             <img src={assets.addservice} alt="" />
-            <p className="hidden md:block">Add Business Service</p>
+            <p className="hidden md:block">Add Service</p>
           </NavLink>
 
           <NavLink
@@ -92,7 +88,7 @@ const Sidebar = () => {
             to={"/staff-registration"}
           >
             <img src={assets.adduser} alt="" />
-            <p className="hidden md:block">Staff Registration</p>
+            <p className="hidden md:block">Add Admin Staff</p>
           </NavLink>
 
           <NavLink
@@ -114,11 +110,8 @@ const Sidebar = () => {
             to={"/manage-staff"}
           >
             <img src={assets.staffmanagement} alt="" />
-            <p className="hidden md:block"> All Staff Management </p>
+            <p className="hidden md:block"> Manage Employees </p>
           </NavLink>
-
-
-
 
           <NavLink
             className={({ isActive }) =>
@@ -128,16 +121,11 @@ const Sidebar = () => {
             to={"/analytic-dashboard"}
           >
             <img src={assets.analyticdashboard} alt="" />
-            <p className="hidden md:block">Analytic Dashboard</p>
+            <p className="hidden md:block">Analytics & Reports</p>
           </NavLink>
-
-
-
 
         </ul>
       )}
-
-
 
       {dToken && (
         <ul className="text-[#515151] mt-5">
@@ -151,19 +139,6 @@ const Sidebar = () => {
             <img src={assets.home} alt="" />
             <p className="hidden md:block">Dashboard</p>
           </NavLink>
-          {/* <NavLink
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-3.5 text-black  px-3 md:px-9 md:min-w-72 cursor-pointer ${
-                isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
-              }`
-            }
-            to={"/staff-appointments"}
-          >
-            <img src={assets.schedule} alt="" />
-            <p className="hidden md:block">Appointments</p>
-          </NavLink> */}
-
-
 
           <NavLink
             className={({ isActive }) =>
@@ -173,7 +148,7 @@ const Sidebar = () => {
             to={"/staff-manage-appointments"}
           >
             <img src={assets.schedule} alt="" />
-            <p className="hidden md:block">Manage Appointments</p>
+            <p className="hidden md:block">My Appointments</p>
           </NavLink>
 
 
@@ -185,10 +160,8 @@ const Sidebar = () => {
             to={"/staff-calendar"}
           >
             <img src={assets.Date} alt="" />
-            <p className="hidden md:block">Calendar </p>
+            <p className="hidden md:block">My Calendar </p>
           </NavLink>
-
-
 
           <NavLink
             className={({ isActive }) =>
@@ -198,23 +171,8 @@ const Sidebar = () => {
             to={"/booking_page"}
           >
             <img src={assets.book} alt="" />
-            <p className="hidden md:block">Book Appointment</p>
+            <p className="hidden md:block">Manual Booking</p>
           </NavLink>
-
-
-
-          <NavLink
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-3.5 text-black  px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? "bg-[#E3D5B3] text-black  border-r-4 border-beige" : ""
-              }`
-            }
-            to={"/ReminderPage"}
-          >
-            <img src={assets.notification} alt="" />
-            <p className="hidden md:block">Reminder</p>
-          </NavLink>
-
-
         </ul>
       )}
     </div>

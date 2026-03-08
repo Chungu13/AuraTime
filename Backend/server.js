@@ -13,6 +13,7 @@ import adminRouter from "./routes/adminRoute.js";
 
 import staffRouter from "./routes/staffRoute.js";
 import userRouter from "./routes/usersRoute.js";
+import { initCronJobs } from "./cronJobs.js";
 
 //app config
 
@@ -21,6 +22,7 @@ const port = process.env.PORT || 4000;
 
 connectDB();
 connectCloudinary();
+initCronJobs();
 
 
 // CORS Config 

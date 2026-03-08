@@ -13,43 +13,34 @@ import Sidebar from "./components/Sidebar";
 import { Route, Routes } from "react-router-dom";
 import DashBoard from "./pages/Admin/Dashboard";
 
-import AllAppointments from "./pages/Admin/AllAppointments";
+import AllAppointments from "./pages/Admin/AdminCalendar.jsx";
 
 import AddService from "./pages/Admin/AddService.jsx";
 
 import ServiceList from "./pages/Admin/ServiceList.jsx";
 import { StaffContext } from "./context/StaffContext";
 import StaffDashboard from "./pages/Staff/StaffDashboard";
-import StaffAppointmets from "./pages/Staff/StaffAppointments";
 import StaffProfile from "./pages/Staff/StaffProfile";
 import TopLoadingBar from "./components/TopLoadingBar";
-import Feedback from "./pages/Admin/Feedback.jsx";
-import StaffRegistration from "./pages/Admin/StaffRegistration";
+import Feedback from "./pages/Admin/CustomerFeedback.jsx";
+import StaffRegistration from "./pages/Admin/AddAdminStaff.jsx";
 import StaffFeedbacks from "./pages/Staff/StaffFeedbacks";
 
-import ManualBookingForm from "./pages/Staff/StaffManualBooking";
+import ManualBookingForm from "./pages/Staff/ManualBooking.jsx";
 
-import RegisterTherapist from "./pages/Admin/TherapistRegistration.jsx";
+import RegisterTherapist from "./pages/Admin/AddTherapist.jsx";
 
-import ManageStaff from "./pages/Admin/StaffManagement.jsx";
+import ManageStaff from "./pages/Admin/ManageEmployees.jsx";
 
-import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
-
-import StaffReminder from "./pages/Staff/Reminders";
-
-import ReminderPage from "./pages/Staff/ReminderPage";
-
-import Reports from "./pages/Admin/Reports";
+import AnalyticsDashboard from "./pages/Admin/AnalyticsAndReports.jsx";
 
 import ReportsPage from "./pages/Admin/ReportsPage.jsx";
 
-import Therapists from "./pages/Admin/Therapists.jsx";
+import ManageAppointments from "./pages/Admin/AppointmentsAndRevenue.jsx";
 
-import ManageAppointments from "./pages/Admin/AppointmentManagement.jsx";
+import StaffManageAppointments from "./pages/Staff/MyStaffAppointments.jsx";
 
-import StaffManageAppointments from "./pages/Staff/StaffManageAppointments.jsx";
-
-import CalendarView from "./pages/Staff/StaffCalendar.jsx";
+import CalendarView from "./pages/Staff/MyStaffCalendar.jsx";
 
 const App = () => {
   const { aToken } = useContext(AdminContext);
@@ -105,21 +96,13 @@ const App = () => {
 
             {/* Staff Routes */}
             <Route path="/staff-dashboard" element={<StaffDashboard />} />
-            <Route path="/staff-appointments" element={<StaffAppointmets />} />
             <Route path="/staff-profile" element={<StaffProfile />} />
 
             <Route path="/staff-registration" element={<StaffRegistration />} />
             <Route path="/staff-feedbacks" element={<StaffFeedbacks />} />
             <Route path="/booking_page" element={<ManualBookingForm />} />
 
-            <Route path="/Reminder" element={<StaffReminder />} />
-
-            <Route path="/ReminderPage" element={<ReminderPage />} />
-
             <Route path="/reportsPage" element={<ReportsPage />} />
-
-            <Route path="/therapists" element={<Therapists />} />
-            <Route path="/reports" element={<Reports />} />
 
             <Route
               path="/appointment-management"
