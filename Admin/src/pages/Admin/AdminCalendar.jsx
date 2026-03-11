@@ -36,7 +36,7 @@ const AllAppointments = () => {
   } = useContext(AdminContext);
 
   const { currency } = useContext(AppContext);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredAppointments, setFilteredAppointments] = useState([]);
 
 
@@ -63,16 +63,14 @@ const AllAppointments = () => {
   });
 
   useEffect(() => {
-    if (aToken && !selectedDate) {
+    if (aToken) {
       getAllAppointments();
-    }
-  }, [aToken, selectedDate]);
-
-  useEffect(() => {
-    if (aToken && professionalStaffs.length === 0) {
       getAllProfessionalStaff();
+      // Fetch today's appointments by default
+      const formatted = new Date().toLocaleDateString("en-CA");
+      getAppointmentsByDate(formatted).then(apps => setFilteredAppointments(apps || []));
     }
-  }, [aToken, professionalStaffs]);
+  }, [aToken]);
 
   const handleDateChange = async (date) => {
     setSelectedDate(date);
@@ -178,7 +176,7 @@ const AllAppointments = () => {
           </p>
         )}
 
-        <div style={{ height: "80vh", backgroundColor: "#fff", borderRadius: "8px", padding: "10px" }}>
+        <div className="h-[80vh] bg-white rounded-lg p-2.5">
           <Calendar
             localizer={localizer}
             events={events}

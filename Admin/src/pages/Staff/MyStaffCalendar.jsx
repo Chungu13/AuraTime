@@ -31,16 +31,13 @@ const CalendarView = () => {
     dToken,
     appointments,
     getAppointments,
-    cancelAppointment,
-    completeAppointment,
     getAppointmentsByDate,
     getAllProfessionalStaff,
     professionalStaffs,
-    updateStaffForAppointment,
   } = useContext(StaffContext);
 
   const { currency } = useContext(AppContext);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredAppointments, setFilteredAppointments] = useState([]);
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -56,17 +53,16 @@ const CalendarView = () => {
     setSelectedAppointment(null);
   };
 
-  useEffect(() => {
-    if (dToken && !selectedDate) {
-      getAppointments();
-    }
-  }, [dToken, selectedDate]);
 
   useEffect(() => {
-    if (dToken && professionalStaffs.length === 0) {
+    if (dToken) {
+      getAppointments();
       getAllProfessionalStaff();
+      // Fetch today's appointments by default
+      const formatted = new Date().toLocaleDateString("en-CA");
+      getAppointmentsByDate(formatted).then(apps => setFilteredAppointments(apps || []));
     }
-  }, [dToken, professionalStaffs]);
+  }, [dToken]);
 
   const handleDateChange = async (date) => {
     setSelectedDate(date);
@@ -104,7 +100,7 @@ const CalendarView = () => {
 
         return {
           id: item._id,
-          title: `${item.staffName || "No Staff"} - ${item.businessData?.service_name || "No Service"}`,
+          title: `${item.userData?.name || "Client"} - ${item.businessData?.service_name || "No Service"} (${item.staffName || "No Staff"})`,
           start,
           end,
           resource: item,
@@ -113,12 +109,11 @@ const CalendarView = () => {
       .filter(Boolean);
   }, [displayAppointments]);
 
-
   const eventStyleGetter = (event) => {
     const { cancelled, isCompleted } = event.resource || {};
-    let backgroundColor = "#598fe6ff";
-    if (cancelled) backgroundColor = "#d17575ff";
-    else if (isCompleted) backgroundColor = "#5fd8b0ff";
+    let backgroundColor = "#598fe6ff"; // blue
+    if (cancelled) backgroundColor = "#d17575ff"; // red
+    else if (isCompleted) backgroundColor = "#5fd8b0ff"; // green
 
     return {
       style: {
@@ -133,25 +128,15 @@ const CalendarView = () => {
     };
   };
 
-
-
-
-
   const handleSelectEvent = (event) => {
     openModal(event.resource);
   };
 
-
-  const completedAppointments = displayAppointments.filter((item) => item.isCompleted);
-  const totalRevenue = completedAppointments.reduce((total, item) => {
-    return total + (item?.businessData?.fees || 0);
-  }, 0);
-
   return (
     <div className="w-full max-w-7xl m-5">
-      <MoveUpOnRender id="admin-calendar">
+      <MoveUpOnRender id="staff-calendar">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-          <p className="text-lg font-medium text-black">Appointment Calendar View</p>
+          <p className="text-lg font-medium text-black">My Calendar View</p>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <DatePicker
               selected={selectedDate}
@@ -161,9 +146,6 @@ const CalendarView = () => {
               dateFormat="yyyy-MM-dd"
               isClearable
             />
-            <p className="text-sm text-green-600 font-medium">
-              Revenue: {currency}{totalRevenue}
-            </p>
           </div>
         </div>
 
@@ -173,7 +155,7 @@ const CalendarView = () => {
           </p>
         )}
 
-        <div style={{ height: "80vh", backgroundColor: "#fff", borderRadius: "8px", padding: "10px" }}>
+        <div className="h-[80vh] bg-white rounded-lg p-2.5">
           <Calendar
             localizer={localizer}
             events={events}
@@ -190,48 +172,44 @@ const CalendarView = () => {
               event: CustomEvent,
             }}
           />
-
-          <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
-            contentLabel="Appointment Details"
-            style={{
-              content: {
-                top: '20%',
-                left: '20%',
-                right: '20%',
-                bottom: 'auto',
-                borderRadius: '12px',
-                padding: '20px',
-                backgroundColor: '#fff',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              },
-            }}
-            ariaHideApp={false}
-
-          >
-
-
-            {selectedAppointment && (
-              <div className="space-y-2">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">Appointment Details</h2>
-                <p><strong>Therapist:</strong> {selectedAppointment.staffName}</p>
-                <p><strong>Client:</strong> {selectedAppointment.userData?.name}</p>
-                <p><strong>Service:</strong> {selectedAppointment.businessData?.service_name}</p>
-                <p><strong>Date:</strong> {new Date(selectedAppointment.slotDate).toDateString()}</p>
-                <p><strong>Time:</strong> {selectedAppointment.slotTime}</p>
-                <p><strong>Duration:</strong> {selectedAppointment.businessData?.serviceDuration}</p>
-                <button
-                  onClick={closeModal}
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Close
-                </button>
-              </div>
-            )}
-          </Modal>
-
         </div>
+
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel="Appointment Details"
+          style={{
+            content: {
+              top: '20%',
+              left: '20%',
+              right: '20%',
+              bottom: 'auto',
+              borderRadius: '12px',
+              padding: '20px',
+              backgroundColor: '#fff',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+          }}
+          ariaHideApp={false}
+        >
+          {selectedAppointment && (
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">Appointment Details</h2>
+              <p><strong>Therapist:</strong> {selectedAppointment.staffName}</p>
+              <p><strong>Client:</strong> {selectedAppointment.userData?.name}</p>
+              <p><strong>Service:</strong> {selectedAppointment.businessData?.service_name}</p>
+              <p><strong>Date:</strong> {new Date(selectedAppointment.slotDate).toDateString()}</p>
+              <p><strong>Time:</strong> {selectedAppointment.slotTime}</p>
+              <p><strong>Duration:</strong> {selectedAppointment.businessData?.serviceDuration} mins</p>
+              <button
+                onClick={closeModal}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </Modal>
       </MoveUpOnRender>
     </div>
   );

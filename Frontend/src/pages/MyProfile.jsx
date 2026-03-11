@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import MoveUpOnRender from "../components/MoveUpOnRender";
 
 const MyProfile = () => {
@@ -18,7 +18,9 @@ const MyProfile = () => {
       formData.append("name", userData.name);
 
       // Clean and format phone for Zambia
-      const cleanPhone = userData.phone.replace(/\+260/g, '').replace(/\s/g, '');
+      let cleanPhone = userData.phone.replace(/\+260/g, '').replace(/\s/g, '');
+      if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
+
       if (!/^(97|96|95|77|76|75)\d{7}$/.test(cleanPhone)) {
         return toast.error("Please enter a valid 9-digit Zambian mobile number (e.g., 971 234 567)");
       }

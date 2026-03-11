@@ -18,9 +18,24 @@ export default {
           "0%": { width: "0%" },
           "100%": { width: "100%" },
         },
+        cardIn: {
+          "0%": { opacity: "0", transform: "translateY(20px) scale(0.97)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        shimmer: {
+          "0%, 100%": { "background-position": "0% 50%" },
+          "50%": { "background-position": "100% 50%" },
+        },
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         expandWidth: "expandWidth 1s linear infinite",
+        cardIn: "cardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both",
+        shimmer: "shimmer 4s ease-in-out infinite",
+        fadeUp: "fadeUp 0.35s ease both",
       },
     },
   },

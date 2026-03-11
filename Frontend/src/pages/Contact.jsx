@@ -1,113 +1,62 @@
-import { useRef } from "react";
-import emailjs from "emailjs-com";
+import { MessageCircle, Phone, Mail } from "lucide-react";
+import MoveUpOnRender from "../components/MoveUpOnRender";
 
-const ContactForm = () => {
-  const form = useRef();
-
-  const sendEmail = (e) => {
-    e.preventDefault();
-
-    emailjs.sendForm(
-      "service_alug20r",
-      "template_w0epjvn",
-      form.current,
-      "XbY-6mEHYkvwDVZcO"
-    )
-      .then(
-        () => {
-          alert("Email sent successfully!");
-          form.current.reset();
-        },
-        (error) => {
-          alert("Failed to send email: " + error.text);
-        }
-      );
-  };
+const Contact = () => {
+  const phoneNumber = "+60123456789"; // Replace with your actual business number
+  const whatsappNumber = "60123456789"; // Format: countrycode + number (no + or 0)
+  const businessEmail = "hello@auratime.com";
 
   return (
-    <div style={{
-      maxWidth: "500px",
-      margin: "auto",
-      padding: "30px",
-      backgroundColor: "#f9f9f9",
-      borderRadius: "12px",
-      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-      fontFamily: "Arial, sans-serif"
-    }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#333" }}>📧 Contact Us</h2>
+    <div className="min-h-[70vh] flex items-center justify-center p-4 bg-[#FAFAF8]">
+      <MoveUpOnRender id="contact-container">
+        <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl border border-[#E8E8E1] p-10 sm:p-14 text-center">
+          <div className="mb-10">
+            <div className="w-16 h-16 bg-beige/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <MessageCircle size={32} className="text-beige" />
+            </div>
+            <h1 className="text-3xl font-bold text-[#1A1A18] tracking-tight mb-3">Get in Touch</h1>
+            <p className="text-[#6B6B5E] text-sm font-medium">
+              Have questions? We're here to help you on your wellness journey.
+            </p>
+          </div>
 
-      <form ref={form} onSubmit={sendEmail}>
-        <label style={labelStyle}>Subject</label>
-        <input type="text" name="title" required style={inputStyle} placeholder="e.g. Booking Inquiry" />
+          <div className="space-y-4">
+            {/* WhatsApp Button */}
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=Hello%20AuraTime!%20I'd%20like%20to%20inquire%20about%20your%20services.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 w-full bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:bg-[#20bd5a] transition-all active:scale-[0.98] shadow-lg shadow-green-500/10"
+            >
+              <MessageCircle size={20} />
+              Chat on WhatsApp
+            </a>
 
-        <label style={labelStyle}>Name</label>
-        <input type="text" name="name" required style={inputStyle} placeholder="Your Full Name" />
+            {/* Phone Button */}
+            <a
+              href={`tel:${phoneNumber}`}
+              className="flex items-center justify-center gap-3 w-full bg-[#1A1A18] text-white py-4 rounded-2xl font-bold hover:bg-black transition-all active:scale-[0.98] shadow-lg shadow-black/10"
+            >
+              <Phone size={20} />
+              Call Us Now
+            </a>
 
-        <label style={labelStyle}>Email</label>
-        <input type="email" name="email" required style={inputStyle} placeholder="you@example.com" />
-
-        <label style={labelStyle}>Message</label>
-        <textarea name="message" required rows="5" style={textareaStyle} placeholder="Type your message here..." />
-
-        <button type="submit" style={buttonStyle}>Send Message</button>
-      </form>
-
-      <a
-        href="https://wa.me/60123456789?text=Hello%2C%20I'm%20interested%20in%20your%20services"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={whatsappButtonStyle}
-      >
-        💬 Chat on WhatsApp
-      </a>
+            {/* Email (Optional link) */}
+            <div className="pt-8 border-t border-[#E8E8E1] mt-8">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#9E9E8C] mb-4">Or email us at</p>
+              <a
+                href={`mailto:${businessEmail}`}
+                className="text-beige font-bold hover:underline flex items-center justify-center gap-2"
+              >
+                <Mail size={16} />
+                {businessEmail}
+              </a>
+            </div>
+          </div>
+        </div>
+      </MoveUpOnRender>
     </div>
   );
 };
 
-
-const labelStyle = {
-  display: "block",
-  marginBottom: "5px",
-  fontWeight: "bold",
-  color: "#555"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "8px",
-  border: "1px solid #ccc",
-  boxSizing: "border-box",
-  fontSize: "14px"
-};
-
-const textareaStyle = {
-  ...inputStyle,
-  resize: "vertical"
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "12px",
-  backgroundColor: "#583603d7",
-  color: "#fff",
-  border: "none",
-  borderRadius: "8px",
-  fontSize: "16px",
-  cursor: "pointer"
-};
-
-const whatsappButtonStyle = {
-  display: "block",
-  marginTop: "20px",
-  textAlign: "center",
-  padding: "12px",
-  backgroundColor: "#25D366",
-  color: "#fff",
-  textDecoration: "none",
-  borderRadius: "8px",
-  fontWeight: "bold"
-};
-
-export default ContactForm;
+export default Contact;

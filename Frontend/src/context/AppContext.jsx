@@ -10,7 +10,7 @@ const AppContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : ""
+    sessionStorage.getItem("token") || ""
   );
   const [userData, setUserData] = useState(false);
 

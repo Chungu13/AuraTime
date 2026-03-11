@@ -23,13 +23,7 @@ const Dashboard = () => {
   }, [aToken]);
 
   const StaffIcon = () => (
-    <div style={{
-      width: 40, height: 40, borderRadius: 10,
-      background: "linear-gradient(135deg, #f5ede0, #e8d8c0)",
-      border: "1px solid rgba(201,169,122,0.3)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#a07850", flexShrink: 0,
-    }}>
+    <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#f5ede0] to-[#e8d8c0] border border-[#c9a97a]/30 flex items-center justify-center text-[#a07850] shrink-0">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
@@ -40,13 +34,7 @@ const Dashboard = () => {
   );
 
   const AppointmentIcon = () => (
-    <div style={{
-      width: 40, height: 40, borderRadius: 10,
-      background: "linear-gradient(135deg, #f5ede0, #e8d8c0)",
-      border: "1px solid rgba(201,169,122,0.3)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#a07850", flexShrink: 0,
-    }}>
+    <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#f5ede0] to-[#e8d8c0] border border-[#c9a97a]/30 flex items-center justify-center text-[#a07850] shrink-0">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
@@ -58,13 +46,7 @@ const Dashboard = () => {
   );
 
   const UsersIcon = () => (
-    <div style={{
-      width: 40, height: 40, borderRadius: 10,
-      background: "linear-gradient(135deg, #f5ede0, #e8d8c0)",
-      border: "1px solid rgba(201,169,122,0.3)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#a07850", flexShrink: 0,
-    }}>
+    <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#f5ede0] to-[#e8d8c0] border border-[#c9a97a]/30 flex items-center justify-center text-[#a07850] shrink-0">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="7" r="4" />

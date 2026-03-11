@@ -74,7 +74,48 @@ const MyAppointments = () => {
       toast.error(error.message);
     }
   };
+  const deleteHistory = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/delete-history",
+        { appointmentId },
+        { headers: { token } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getUserAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("error:", error);
+      toast.error(error.message);
+    }
+  };
 
+  const clearAllHistory = async () => {
+    // Confirmation before clear
+    if (!window.confirm("Are you sure you want to clear your entire appointment history? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/clear-all-history",
+        {},
+        { headers: { token } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getUserAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("error:", error);
+      toast.error(error.message);
+    }
+  };
 
 
   const handleStripePayment = async (appointmentId, payment_type = "deposit") => {
@@ -112,9 +153,19 @@ const MyAppointments = () => {
 
   return (
     <div>
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
-        My appointments
-      </p>
+      <div className="flex justify-between items-center border-b pb-3 mt-12">
+        <p className="font-medium text-zinc-700">
+          My appointments
+        </p>
+        {appointments.length > 0 && (
+          <button
+            onClick={clearAllHistory}
+            className="text-sm bg-red-600 text-white px-5 py-2.5 rounded-2xl hover:bg-stone-800 transition-all duration-300 font-bold shadow-lg shadow-red-500/20 active:scale-[0.98]"
+          >
+            Clear All History
+          </button>
+        )}
+      </div>
 
       <MoveUpOnRender id="my-appointments">
         {appointments.map((item, index) => (
@@ -211,6 +262,16 @@ const MyAppointments = () => {
                 <div className="sm:min-w-48 py-2 border border-green-500 rounded-lg text-green-500 text-center bg-green-50 text-sm font-medium">
                   Service Completed
                 </div>
+              )}
+
+              {/* Delete from History Button */}
+              {(item.cancelled || item.isCompleted) && (
+                <button
+                  onClick={() => deleteHistory(item._id)}
+                  className="text-sm text-neutral-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-neutral-100 transition duration-300 font-medium"
+                >
+                  Delete from History
+                </button>
               )}
             </div>
           </div>

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 import MoveUpOnRender from "../components/MoveUpOnRender";
 
@@ -153,9 +153,8 @@ const MyFeedback = () => {
               <span
                 key={num}
                 onClick={() => setRating(num)}
-                className={`text-2xl cursor-pointer ${
-                  num <= rating ? "text-yellow-400" : "text-gray-300"
-                }`}
+                className={`text-2xl cursor-pointer ${num <= rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
               >
                 ★
               </span>

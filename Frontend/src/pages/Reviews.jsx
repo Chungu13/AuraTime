@@ -31,7 +31,7 @@ const Reviews = () => {
     <div className="w-full max-w-5xl px-4 py-8 mx-auto">
       <MoveUpOnRender id="customer-feedbacks">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">🌟 What Our Customers Say</h2>
+          <h2 className="text-2xl font-bold text-gray-800">What Our Customers Say</h2>
           <span className="text-sm text-gray-500">Total Reviews: {feedbacks.length}</span>
         </div>
 
@@ -90,7 +90,7 @@ const Reviews = () => {
           </div>
         ) : (
           <div className="py-12 text-center">
-            <p className="text-gray-400 text-lg">😔 No reviews available yet.</p>
+            <p className="text-gray-400 text-lg"> No reviews available yet.</p>
           </div>
         )}
       </MoveUpOnRender>

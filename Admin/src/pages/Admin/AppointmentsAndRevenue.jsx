@@ -57,18 +57,18 @@ const ManageAppointments = () => {
 
   const { currency, calculateAge } = useContext(AppContext);
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
-    if (aToken && !selectedDate) getAllAppointments();
-  }, [aToken, selectedDate]);
-
-  useEffect(() => {
-    if (aToken && professionalStaffs.length === 0) {
+    if (aToken) {
+      getAllAppointments();
       getAllProfessionalStaff();
+      // Fetch today's appointments by default
+      const formatted = new Date().toLocaleDateString("en-CA");
+      getAppointmentsByDate(formatted).then(apps => setFilteredAppointments(apps || []));
     }
   }, [aToken]);
 
@@ -293,41 +293,35 @@ const ManageAppointments = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    {!item.cancelled && !item.isCompleted && (
-                      <>
-                        <button
-                          onClick={() => {
-                            if (window.confirm("Cancel this appointment?")) cancelAppointment(item._id);
-                          }}
-                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                          title="Cancel"
-                        >
-                          <XCircle size={18} />
-                        </button>
-                        <button
-                          onClick={() => completeAppointment(item._id)}
-                          className="flex items-center gap-1.5 bg-slate-900 text-white px-4 py-2 rounded-xl text-[11px] font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 active:scale-95 transition-all"
-                        >
-                          <CheckCircle2 size={14} /> Finish
-                        </button>
-                      </>
-                    )}
-
-                    {item.isCompleted && !item.isPaidInFull && (
+                    {!item.cancelled && !item.isPaidInFull && (
                       <div className="flex gap-2">
+                        {!item.isCompleted && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm("Cancel this appointment?")) cancelAppointment(item._id);
+                            }}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            title="Cancel"
+                          >
+                            <XCircle size={18} />
+                          </button>
+                        )}
+
                         <button
                           onClick={() => {
-                            if (window.confirm("Mark as paid in cash?")) markAsPaid(item._id);
+                            if (window.confirm("Mark as paid in cash? This will also complete the appointment.")) markAsPaid(item._id);
                           }}
                           className="flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-2 rounded-xl text-[11px] font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all"
                         >
                           <CircleDollarSign size={14} /> Paid Cash
                         </button>
                         <button
-                          onClick={() => payRemainingBalance(item._id)}
+                          onClick={() => {
+                            if (window.confirm("Generate online payment link? This will also mark the service as finished.")) payRemainingBalance(item._id);
+                          }}
                           className="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-xl text-[11px] font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all"
                         >
-                          <CircleDollarSign size={14} /> Link to Pay
+                          <CircleDollarSign size={14} /> Paid Online
                         </button>
                       </div>
                     )}

@@ -481,7 +481,7 @@ const checkSlotAvailability = async (staffId, slotDate, slotTime) => {
 const listAppointment = async (req, res) => {
   try {
     const { userId } = req.body;
-    const appointments = await appointmentModel.find({ userId });
+    const appointments = await appointmentModel.find({ userId, isDeletedByCustomer: false });
 
     if (!appointments) {
       return res.json({ success: false, message: "No Appointment" });
@@ -627,6 +627,51 @@ const cancelAppointment = async (req, res) => {
     res.json({ success: true, message: "Appointment Cancelled" });
   } catch (error) {
     console.error("Cancel appointment error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const deleteHistory = async (req, res) => {
+  try {
+    const { appointmentId, userId } = req.body;
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (!appointmentData) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    if (appointmentData.userId !== userId) {
+      return res.status(403).json({ success: false, message: "Unauthorized action" });
+    }
+
+    // Mark as deleted by customer (soft hide)
+    await appointmentModel.findByIdAndUpdate(appointmentId, { isDeletedByCustomer: true });
+
+    res.json({ success: true, message: "Appointment removed from history" });
+  } catch (error) {
+    console.error("Delete history error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const clearAllHistory = async (req, res) => {
+  console.log("🛠️ Received clearAllHistory request for user:", req.body.userId);
+  try {
+    const { userId } = req.body;
+
+    // Mark all completed or cancelled appointments as deleted by customer
+    await appointmentModel.updateMany(
+      {
+        userId,
+        isDeletedByCustomer: false,
+        $or: [{ cancelled: true }, { isCompleted: true }]
+      },
+      { isDeletedByCustomer: true }
+    );
+
+    res.json({ success: true, message: "History cleared successfully" });
+  } catch (error) {
+    console.error("Clear all history error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -779,6 +824,8 @@ export {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  deleteHistory,
+  clearAllHistory,
   submitFeedback,
   fetchExistingAppointment,
   fetchAppointmentById,
