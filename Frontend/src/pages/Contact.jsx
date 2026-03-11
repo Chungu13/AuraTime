@@ -13,15 +13,15 @@ const ContactForm = () => {
       form.current,
       "XbY-6mEHYkvwDVZcO"
     )
-    .then(
-      () => {
-        alert("Email sent successfully!");
-        form.current.reset();
-      },
-      (error) => {
-        alert("Failed to send email: " + error.text);
-      }
-    );
+      .then(
+        () => {
+          alert("Email sent successfully!");
+          form.current.reset();
+        },
+        (error) => {
+          alert("Failed to send email: " + error.text);
+        }
+      );
   };
 
   return (
@@ -64,7 +64,7 @@ const ContactForm = () => {
   );
 };
 
-// Reusable styles
+
 const labelStyle = {
   display: "block",
   marginBottom: "5px",

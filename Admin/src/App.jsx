@@ -1,10 +1,6 @@
 import React, { useContext } from "react";
 import Login from "./pages/Login";
-import { ToastContainer, toast } from "react-toastify";
-
 import { Toaster } from "sonner";
-
-import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { AppContext } from "./context/AppContext";
 import { AdminContext } from "./context/AdminContext";
@@ -49,29 +45,8 @@ const App = () => {
   return aToken || dToken ? (
     <>
       {isLoading && <TopLoadingBar />}
+      <Toaster position="top-center" richColors />
       <div className="bg-[#F8F9FD]">
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          toastClassName={(context) => {
-            if (context?.type === "success") {
-              return "custom-toast-success";
-            }
-            if (context?.type === "error") {
-              return "custom-toast-error";
-            }
-            return "custom-toast-default";
-          }}
-          bodyClassName="toast-body"
-        />
-
         <Navbar />
         <div className="flex items-start">
           <Sidebar />
@@ -122,29 +97,8 @@ const App = () => {
   ) : (
     <div>
       {isLoading && <TopLoadingBar />}
+      <Toaster position="top-center" richColors />
       <Login />
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-        toastClassName={(context) => {
-          if (context?.type === "success") {
-            return "custom-toast-success";
-          }
-          if (context?.type === "error") {
-            return "custom-toast-error";
-          }
-          return "custom-toast-default";
-        }}
-        bodyClassName="toast-body"
-      />
     </div>
   );
 };

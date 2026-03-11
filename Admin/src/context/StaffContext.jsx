@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createContext, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useCallback } from "react";
 
 export const StaffContext = createContext();
@@ -127,7 +127,7 @@ const StaffContextProvider = (props) => {
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -191,7 +191,7 @@ const StaffContextProvider = (props) => {
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -255,7 +255,7 @@ const StaffContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -276,7 +276,7 @@ const StaffContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -338,7 +338,7 @@ const StaffContextProvider = (props) => {
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 

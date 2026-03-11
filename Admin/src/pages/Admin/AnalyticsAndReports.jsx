@@ -196,21 +196,21 @@ const AnalyticsDashboard = () => {
   };
 
   return (
-    
-      <div className="w-full max-w-7xl mx-auto p-4">
-  <div className="flex justify-end mb-4">
-    <Link
-      to="/reportsPage"
-     className="bg-beige text-white px-4 py-2 rounded hover:bg-stone-700 transition duration-200 shadow"
 
-    >
-      📄 View Reports
-    </Link>
-  </div>
+    <div className="w-full max-w-7xl mx-auto p-4">
+      <div className="flex justify-end mb-4">
+        <Link
+          to="/reportsPage"
+          className="bg-beige text-white px-4 py-2 rounded hover:bg-stone-700 transition duration-200 shadow"
+
+        >
+          📄 View Reports
+        </Link>
+      </div>
 
 
 
- 
+
 
 
       {isLoading ? (

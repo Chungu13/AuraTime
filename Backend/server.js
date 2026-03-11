@@ -15,8 +15,6 @@ import staffRouter from "./routes/staffRoute.js";
 import userRouter from "./routes/usersRoute.js";
 import { initCronJobs } from "./cronJobs.js";
 
-//app config
-
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -24,8 +22,6 @@ connectDB();
 connectCloudinary();
 initCronJobs();
 
-
-// CORS Config 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
@@ -33,24 +29,21 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://localhost:5175",
   "https://aura-time-blond.vercel.app",
-  "https://aura-time-admin.vercel.app" 
+  "https://aura-time-admin.vercel.app"
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    // Allow localhost
     if (origin.startsWith("http://localhost")) {
       return callback(null, true);
     }
 
-    // Allow any vercel deployment of this project
     if (origin.includes("vercel.app")) {
       return callback(null, true);
     }
 
-    // Allow your production frontend
     if (origin === process.env.FRONTEND_URL) {
       return callback(null, true);
     }
@@ -70,33 +63,23 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
-//middlewares
 app.use(express.json());
-
-// Security Headers
 app.use(helmet());
-
-// Data Sanitization against NoSQL Query Injection
 app.use(mongoSanitize());
-
-// Data Sanitization against XSS
 app.use(xss());
-
-// Compression
 app.use(compression());
+app.use(morgan("combined"));
 
-// Logging
-app.use(morgan("combined")); // Use 'combined' for standard Apache combined log format
-
-// Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 1000 requests per windowMs
-  message: "Too many requests from this IP, please try again after 15 minutes",
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 50000, // Allow 50,000 requests for testing
+  message: "Too many requests...",
 });
-app.use("/api", limiter); // Apply to API routes
 
-//api end points
+app.use("/api", limiter);
+
 app.use("/api/admin", adminRouter);
 app.use("/api/staff", staffRouter);
 app.use("/api/user", userRouter);
@@ -105,7 +88,6 @@ app.get("/", (req, res) => {
   res.send("Hello I am working Dude 😎");
 });
 
-// Global Error Handler (Simple version)
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');

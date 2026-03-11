@@ -2,7 +2,6 @@ import cron from "node-cron";
 import nodemailer from "nodemailer";
 import appointmentModel from "./models/appointmentModel.js";
 
-// Setup mail transporter
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -21,7 +20,6 @@ export const initCronJobs = () => {
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
-            // Start and end of exactly tomorrow
             const startOfDay = new Date(tomorrow.setHours(0, 0, 0, 0));
             const endOfDay = new Date(tomorrow.setHours(23, 59, 59, 999));
 
@@ -30,7 +28,7 @@ export const initCronJobs = () => {
                     $gte: startOfDay,
                     $lte: endOfDay,
                 },
-                cancelled: false, // Don't remind canceled folks
+                cancelled: false,
             });
 
             if (!appointments || appointments.length === 0) {
@@ -41,7 +39,6 @@ export const initCronJobs = () => {
             console.log(`✉️ Sending out ${appointments.length} reminder emails to customers...`);
 
             for (const appointment of appointments) {
-                // Skip if there's no email or it's somehow missing
                 if (!appointment.userData || !appointment.userData.email) continue;
 
                 const email = appointment.userData.email;
@@ -62,7 +59,6 @@ Warm regards,
 AuraTime & Glow Spa`
                 };
 
-                // Send email silently in the background
                 await transporter.sendMail(mailOptions);
             }
 
@@ -72,5 +68,5 @@ AuraTime & Glow Spa`
         }
     });
 
-    console.log("⚙️ Cron Jobs initialized (Reminders scheduled for 8:00 AM Daily)");
+    console.log("⚙️ Cron Jobs initialized (scheduled for 8:00 AM Daily)");
 };

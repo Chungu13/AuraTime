@@ -22,9 +22,9 @@ const Navbar = () => {
           src={assets.AURA_TIME2}
           alt=""
         />
-        <p className="border px-2.5 py-0.5 rounded-full border-gray-600 text-gray-600">
+        {/* <p className="border px-2.5 py-0.5 rounded-full border-gray-600 text-gray-600">
           {aToken ? "BusinessOwner" : "Staff"}
-        </p>
+        </p> */}
       </div>
       <button
         onClick={logout}

@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const AdminContext = createContext();
 
@@ -88,7 +88,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -151,7 +151,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -241,7 +241,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -288,7 +288,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -317,16 +317,49 @@ const AdminContextProvider = (props) => {
 
       return data;
     } catch (error) {
-      // Check if backend sent a custom error message
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message);
         return { success: false, message: error.response.data.message };
       }
-
-      // Generic fallback
       const message = "Error completing appointment: " + error.message;
       toast.error(message);
       return { success: false, message };
+    }
+  };
+
+  const payRemainingBalance = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/create-admin-checkout-session",
+        { appointmentId, payment_type: "full" },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const markAsPaid = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/mark-as-paid",
+        { appointmentId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+        getDashData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -345,7 +378,7 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message || "An error occurred");
     }
   };
 
@@ -631,7 +664,9 @@ const AdminContextProvider = (props) => {
     reports,
     fetchReports,
     report,
-    fetchReport
+    fetchReport,
+    payRemainingBalance,
+    markAsPaid,
   };
 
   return (

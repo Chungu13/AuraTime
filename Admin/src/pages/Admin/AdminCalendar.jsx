@@ -110,7 +110,7 @@ const AllAppointments = () => {
 
         return {
           id: item._id,
-          title: `${item.staffName || "No Staff"} - ${item.businessData?.service_name || "No Service"}`,
+          title: `${item.userData?.name || "Client"} - ${item.businessData?.service_name || "No Service"} (${item.staffName || "No Staff"})`,
           start,
           end,
           resource: item,

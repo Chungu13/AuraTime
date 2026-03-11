@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react"; // Syncing casing
 import { AppContext } from "../context/AppContext";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MoveUpOnRender from "../components/MoveUpOnRender";
@@ -32,12 +32,12 @@ const MyAppointments = () => {
   ];
 
   const slotDateFormat = (slotDate) => {
-  const date = new Date(slotDate);
-  const day = date.getDate();
-  const month = months[date.getMonth() + 1]; // `months` array starts at index 1
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-};
+    const date = new Date(slotDate);
+    const day = date.getDate();
+    const month = months[date.getMonth() + 1]; // `months` array starts at index 1
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
 
 
   const getUserAppointments = async () => {
@@ -56,56 +56,56 @@ const MyAppointments = () => {
   };
 
   const cancelAppointment = async (appointmentId, userId) => {
-  try {
-    const { data } = await axios.post(
-      backendUrl + "/api/user/cancel-appointment",
-      { appointmentId, userId }, // include userId here
-      { headers: { token } }
-    );
-    if (data.success) {
-      toast.success(data.message);
-      getUserAppointments();
-      getStaffsData();
-    } else {
-      toast.error(data.message);
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/user/cancel-appointment",
+        { appointmentId, userId }, // include userId here
+        { headers: { token } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getUserAppointments();
+        getStaffsData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("error:", error);
+      toast.error(error.message);
     }
-  } catch (error) {
-    console.log("error:", error);
-    toast.error(error.message);
-  }
-};
+  };
 
 
 
-  const handleStripePayment = async (appointmentId, staffName, price) => {
+  const handleStripePayment = async (appointmentId, payment_type = "deposit") => {
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/user/create-checkout-session`,
-        { appointmentId, staffName, price },
+        { appointmentId, payment_type },
         { headers: { token } }
       );
 
       if (data.success) {
         window.location.href = data.url;
       } else {
-        toast.error("Failed to create Stripe session: " + data.error);
+        toast.error("Failed to create Stripe session: " + data.message);
       }
     } catch (err) {
       toast.error("Stripe payment failed to start");
     }
   };
 
-  
+
 
   const handleNavigation = (staffId) => {
     navigate(`/appointment/${staffId}`);
   };
 
   const handleReschedule = (appointmentId, staffId) => {
-    console.log("Navigating with staffId:", staffId, "and appointmentId:", appointmentId); 
-  
-  navigate(`/appointment/${staffId}?appointmentId=${appointmentId}&reschedule=true`);
-};
+    console.log("Navigating with staffId:", staffId, "and appointmentId:", appointmentId);
+
+    navigate(`/appointment/${staffId}?appointmentId=${appointmentId}&reschedule=true`);
+  };
 
 
 
@@ -147,89 +147,74 @@ const MyAppointments = () => {
             <div></div>
 
             <div className="flex flex-col gap-2 justify-end">
-              {!item.cancelled && item.payment && !item.isCompleted && (
-                <button className="text-sm text-white text-center sm:min-w-48 py-2 border bg-beige">
-                  Paid
-                </button>
-              )}
-              {!item.cancelled && !item.payment && !item.isCompleted && (
-                <button
-                  onClick={() =>
-                    handleStripePayment(
-                      item._id,
-                      item.businessData.name,
-                      item.amount
-                    )
-                  }
-                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-beige hover:text-white transition duration-300"
-                >
-                  Pay Online
+              {/* Deposit Status / Confirmed */}
+              {!item.cancelled && item.bookingFeePaid && !item.isCompleted && (
+                <button className={`text-sm text-center sm:min-w-48 py-2 border font-medium cursor-default rounded-lg ${item.depositAmount > 0 ? "text-green-600 border-green-200 bg-green-50" : "text-blue-600 border-blue-200 bg-blue-50"}`}>
+                  {item.depositAmount > 0 ? `Deposit Paid ($${item.depositAmount})` : "Confirmed"}
                 </button>
               )}
 
-              {/* {!item.cancelled && !item.isCompleted && (
+              {/* Pay Deposit Button */}
+              {!item.cancelled && !item.bookingFeePaid && !item.isCompleted && (
+                <button
+                  onClick={() => handleStripePayment(item._id, "deposit")}
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-beige hover:text-white transition duration-300 font-medium"
+                >
+                  Pay Deposit (${item.depositAmount})
+                </button>
+              )}
+
+              {/* Remaining Balance Label/Button */}
+              {!item.cancelled && item.isCompleted && !item.isPaidInFull && (
+                <button
+                  onClick={() => handleStripePayment(item._id, "full")}
+                  className="text-sm text-white text-center sm:min-w-48 py-2 border bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-300 font-bold shadow-md shadow-indigo-100"
+                >
+                  Pay Remaining Balance (${item.amount - item.depositAmount})
+                </button>
+              )}
+
+              {/* Paid in Full Status */}
+              {!item.cancelled && item.isPaidInFull && (
+                <button className="text-sm text-white text-center sm:min-w-48 py-2 border bg-green-600 rounded-lg cursor-default font-bold">
+                  Paid in Full
+                </button>
+              )}
+
+              {/* Cancel Button */}
+              {!item.cancelled && !item.isCompleted && (
                 <button
                   onClick={() => cancelAppointment(item._id)}
-                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white tranisal duration-300"
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-red-600 hover:text-white transition duration-300"
                 >
                   Cancel Appointment
                 </button>
-              )} */}
+              )}
 
+              {/* Reschedule Button */}
+              {!item.cancelled && !item.isCompleted && (
+                <button
+                  onClick={() => handleReschedule(item._id, item?.businessData?._id)}
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-beige hover:text-white transition duration-300"
+                >
+                  Reschedule
+                </button>
+              )}
 
-              {!item.cancelled && !item.isCompleted && !item.payment && (
-  <button
-    onClick={() => cancelAppointment(item._id)}
-    className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white tranisal duration-300"
-  >
-    Cancel Appointment
-  </button>
-)}
-
-
-  {/* <div className="flex flex-col gap-2 justify-end">
-  
-  {!item.cancelled && !item.isCompleted && (
-    <button
-      onClick={() => handleReschedule(item._id, item?.businessData?._id)} // Pass the appointment ID and staffId
-      className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-beige hover:text-white transition duration-300"
-    >
-      Reschedule
-    </button>
-  )}
-</div> */}
-
-
-<div className="flex flex-col gap-2 justify-end">
-
-{!item.cancelled && !item.isCompleted && !item.payment && (
-  <button
-    onClick={() => handleReschedule(item._id, item?.businessData?._id)}
-    className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-beige hover:text-white transition duration-300"
-  >
-    Reschedule
-  </button>
-)}
-
-</div>
-
-
-
-              {item.cancelled && !item.isCompleted && (
-                <button className="sm:min-w-48 py-2 border border-red-500 rounded tex-red-500">
+              {item.cancelled && (
+                <button className="sm:min-w-48 py-2 border border-red-500 rounded-lg text-red-500 bg-red-50 text-sm font-medium">
                   Appointment cancelled
                 </button>
               )}
-              {item.isCompleted && (
-                <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500 ">
-                  Completed
-                </button>
+
+              {item.isCompleted && !item.isPaidInFull && (
+                <div className="sm:min-w-48 py-2 border border-green-500 rounded-lg text-green-500 text-center bg-green-50 text-sm font-medium">
+                  Service Completed
+                </div>
               )}
-
-
             </div>
           </div>
-          
+
 
         ))}
       </MoveUpOnRender>

@@ -16,107 +16,33 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2022-11-15",
 });
 
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// export const createCheckoutSession = async (req, res) => {
-//   const { appointmentId } = req.body;
-
-//   try {
-//     if (!appointmentId) {
-//       console.log("❌ Missing appointmentId in request body");
-//       return res.status(400).json({ success: false, message: "Missing appointmentId" });
-//     }
-
-//     // Fetch appointment from DB
-//     const appointment = await appointmentModel.findById(appointmentId);
-//     if (!appointment) {
-//       console.log("❌ Appointment not found in database");
-//       return res.status(404).json({ success: false, message: "Appointment not found" });
-//     }
-
-//     const { amount, businessData, userId } = appointment;
-//     const amountInCents = Math.round(amount * 100); // Stripe expects amounts in cents
-
-//     // Create Stripe checkout session
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ["card"],
-//       mode: "payment",
-//       line_items: [
-//         {
-//           price_data: {
-//             currency: "usd",
-//             product_data: {
-//               name: `Appointment with ${businessData.name || "Staff"}`,
-//             },
-//             unit_amount: amountInCents,
-//           },
-//           quantity: 1,
-//         },
-//       ],
-//       success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${appointmentId}`,
-//       cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
-//       metadata: {
-//         appointmentId,
-//         userId,
-//       },
-//     });
-
-//     console.log("✅ Stripe checkout session created:", session.id);
-//     res.json({ success: true, url: session.url });
-//   } catch (error) {
-//     console.error("❌ Error creating checkout session:", error.message);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// };
-
-// // -------------------------
-// // VERIFY STRIPE PAYMENT
-// // -------------------------
-// export const verifyStripePayment = async (req, res) => {
-//   const { session_id, appointmentId } = req.query;
-
-//   try {
-//     if (!session_id || !appointmentId) {
-//       return res.status(400).json({ success: false, message: "Missing session_id or appointmentId" });
-//     }
-
-//     const session = await stripe.checkout.sessions.retrieve(session_id);
-
-//     if (session && session.payment_status === "paid") {
-//       // Update appointment in DB
-//       await appointmentModel.findByIdAndUpdate(appointmentId, { payment: true });
-
-//       console.log("✅ Payment verified and appointment updated:", appointmentId);
-//       return res.status(200).json({ success: true, message: "Payment verified." });
-//     } else {
-//       return res.status(400).json({ success: false, message: "Payment not completed." });
-//     }
-//   } catch (error) {
-//     console.error("❌ Error verifying payment:", error.message);
-//     return res.status(500).json({ success: false, message: "Payment verification failed." });
-//   }
-// };
-
 export const createCheckoutSession = async (req, res) => {
-  const { appointmentId } = req.body;
+  const { appointmentId, payment_type = "deposit" } = req.body; // default to deposit
 
   try {
     if (!appointmentId) {
-      console.log(" Missing appointmentId in request body");
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing appointmentId" });
+      return res.status(400).json({ success: false, message: "Missing appointmentId" });
     }
-    // Fetch appointment from DB
+
     const appointment = await appointmentModel.findById(appointmentId);
     if (!appointment) {
-      console.log(" Appointment not found in database");
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
+      return res.status(404).json({ success: false, message: "Appointment not found" });
     }
-    const { amount, businessData, userId } = appointment;
-    const amountInCents = Math.round(amount * 100);
+
+    const { amount, depositAmount, businessData, userId } = appointment;
+
+    // Choose which amount to charge
+    let chargingAmount;
+    let productName;
+    if (payment_type === "full") {
+      chargingAmount = amount - depositAmount;
+      productName = `Final Payment - ${businessData.service_name}`;
+    } else {
+      chargingAmount = depositAmount;
+      productName = `Booking Deposit - ${businessData.service_name}`;
+    }
+
+    const amountInCents = Math.round(chargingAmount * 100);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -126,21 +52,22 @@ export const createCheckoutSession = async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Appointment with ${businessData.name || "Staff"}`,
+              name: productName,
+              description: `Total price was $${amount}. Deposit paid was $${depositAmount}.`
             },
             unit_amount: amountInCents,
           },
           quantity: 1,
         },
       ],
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${appointmentId}`,
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${appointmentId}&payment_type=${payment_type}`,
       cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
       metadata: {
         appointmentId,
         userId,
+        paymentType: payment_type
       },
     });
-    console.log(" Stripe checkout session created successfully:", session.id);
 
     res.json({ success: true, url: session.url });
   } catch (error) {
@@ -152,31 +79,59 @@ export const createCheckoutSession = async (req, res) => {
 const stripeInstance = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const verifyStripePayment = async (req, res) => {
-  const { session_id, appointmentId } = req.query;
+  const { session_id } = req.query;
 
   try {
     const session = await stripeInstance.checkout.sessions.retrieve(session_id);
+    const { staffId, userId, slotDate, slotTime, paymentType } = session.metadata;
 
     if (session && session.payment_status === "paid") {
-      // Update DB
-      await appointmentModel.findByIdAndUpdate(appointmentId, {
-        payment: true,
+
+      // 1. Check if appointment already exists (prevent duplicates if user refreshes)
+      let appointment = await appointmentModel.findOne({
+        staffId,
+        slotDate: new Date(`${slotDate}T00:00:00.000Z`),
+        slotTime
       });
 
-      console.log("✅ Appointment updated:", appointmentId);
-      return res
-        .status(200)
-        .json({ success: true, message: "Payment verified." });
+      if (!appointment) {
+        // 2. FETCH DATA REQUIRED FOR RECORDING
+        const userData = await userModel.findById(userId).select("-password");
+        const businessData = await businessModel.findById(staffId).select("-password -slots_booked");
+
+        // 3. CREATE THE RECORD FOR THE FIRST TIME
+        const appointmentData = {
+          userId,
+          staffId,
+          userData,
+          businessData,
+          amount: Number(session.metadata.amount),
+          depositAmount: Number(session.metadata.depositAmount),
+          slotTime,
+          slotDate: new Date(`${slotDate}T00:00:00.000Z`),
+          date: Date.now(),
+          bookingFeePaid: true,
+          isPaidInFull: paymentType === "full",
+        };
+
+        appointment = new appointmentModel(appointmentData);
+        await appointment.save();
+        console.log("📝 Appointment record created after payment:", appointment._id);
+      } else {
+        // 4. If it's a follow-up payment (full balance), just update the flags
+        if (paymentType === "full") {
+          appointment.isPaidInFull = true;
+          await appointment.save();
+        }
+      }
+
+      return res.json({ success: true, message: "Payment verified and appointment confirmed." });
     } else {
-      return res
-        .status(400)
-        .json({ success: false, message: "Payment not completed." });
+      return res.status(400).json({ success: false, message: "Payment not completed." });
     }
   } catch (error) {
     console.error("❌ Error verifying payment:", error.message);
-    return res
-      .status(500)
-      .json({ success: false, message: "Payment verification failed." });
+    return res.status(500).json({ success: false, message: "Payment verification failed." });
   }
 };
 
@@ -229,110 +184,73 @@ const registerUser = async (req, res) => {
 
     res.json({ success: true, token });
   } catch (error) {
-    console.error("Registration error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong. Please try again.",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-
-//api for user login
 
 const loginUser = async (req, res) => {
   try {
     const { email: rawEmail, password } = req.body;
     const email = rawEmail.toLowerCase();
 
-    // Check if all fields are entered
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Enter a valid email" });
+      return res.status(400).json({ success: false, message: "Enter a valid email" });
     }
 
-    console.log("📥 Login request body:", req.body);
-    // Check if user exists
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User does not exist" });
+      return res.status(404).json({ success: false, message: "User does not exist" });
     }
 
-    console.log("✅ User found:", user.email);
-    console.log("👉 Input password:", password);
-    console.log("🔐 Stored hashed password:", user.password);
-
-    // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    console.log("🔍 Passwords match?", isMatch);
-
-    // Generate JWT
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.json({ success: true, token });
   } catch (error) {
-    console.error("error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error. Please try again later.",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-
-//API to get user profile data
 
 const getProfile = async (req, res) => {
   try {
     const { userId } = req.body;
-
     const userData = await userModel.findById(userId).select("-password");
-
     res.json({ success: true, userData });
   } catch (error) {
-    console.log("error:", error);
     res.json({ success: false, message: error.message });
   }
 };
-
-//API to update user profile
 
 const updateProfile = async (req, res) => {
   try {
     const { userId, name, phone, address, dob, gender } = req.body;
     const imageFile = req.file;
 
-    // 1. Validate required fields
-    if (!name || !phone || !dob || !gender) {
+    if (!name || !phone || !dob || !gender || !address) {
       return res.json({ success: false, message: "All fields are required" });
     }
 
-    // 2. Validate name starts with a capital letter
+    const parsedAddress = JSON.parse(address);
+    if (!parsedAddress.line1 || !parsedAddress.line1.trim()) {
+      return res.json({ success: false, message: "Address is mandatory" });
+    }
+
     const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
     if (!nameRegex.test(name)) {
       return res.json({
         success: false,
-        message:
-          "Name must start with a capital letter and contain only letters and spaces",
+        message: "Name must start with a capital letter and contain only letters and spaces",
       });
     }
 
-    // 3. Validate phone: 8–15 digits, can start with +
     const phoneRegex = /^(\+?\d{8,15})$/;
     if (!phoneRegex.test(phone)) {
       return res.json({
@@ -341,7 +259,6 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    // 4. Update user profile fields
     await userModel.findByIdAndUpdate(userId, {
       name,
       phone,
@@ -350,7 +267,6 @@ const updateProfile = async (req, res) => {
       gender,
     });
 
-    // 5. If image is uploaded, upload to Cloudinary and update profile
     if (imageFile) {
       const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
         resource_type: "image",
@@ -362,7 +278,6 @@ const updateProfile = async (req, res) => {
 
     res.json({ success: true, message: "Profile updated successfully" });
   } catch (error) {
-    console.error("error:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -403,24 +318,23 @@ const bookAppointment = async (req, res) => {
     const userData = await userModel.findById(userId).select("-password");
     delete businessData.slots_booked;
 
-    const appointmentData = {
-      userId,
-      staffId,
-      userData,
-      businessData,
-      amount: businessData.fees,
-      slotTime,
-      slotDate: new Date(`${slotDate}T00:00:00.000Z`),
-      date: Date.now(),
-      payment: false, // Must be paid to be valid
-    };
+    const depositAmount = businessData.bookingFee || 0;
+    const totalAmount = businessData.fees || 0;
 
-    const newAppointment = new appointmentModel(appointmentData);
-    await newAppointment.save();
+    // A: IF BOTH FEES ARE 0 -> Error (User doesn't want free bookings)
+    if (depositAmount === 0 && totalAmount === 0) {
+      return res.json({ success: false, message: "A fee must be set for this service. Please contact admin." });
+    }
+
+    // B: IF NO DEPOSIT REQUIRED -> Lock slot and redirect to pay FULL AMOUNT
     await businessModel.findByIdAndUpdate(staffId, { slots_booked });
 
-    // ✅ Generate Stripe Session URL
-    const amountInCents = Math.round(businessData.fees * 100);
+    // Determine what we are charging now
+    const isFullPayment = depositAmount === 0;
+    const amountToCharge = isFullPayment ? totalAmount : depositAmount;
+    const paymentType = isFullPayment ? "full" : "deposit";
+
+    const amountInCents = Math.round(amountToCharge * 100);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -430,29 +344,39 @@ const bookAppointment = async (req, res) => {
             currency: "usd",
             product_data: {
               name: `AuraTime - ${businessData.service_name}`,
+              description: isFullPayment
+                ? `Full payment for ${businessData.service_name}.`
+                : `Initial booking fee for ${businessData.service_name}. Total price: $${totalAmount}`
             },
             unit_amount: amountInCents,
           },
           quantity: 1,
         },
       ],
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${newAppointment._id}`,
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&payment_type=${paymentType}`,
       cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
       metadata: {
-        appointmentId: newAppointment._id.toString(),
-        userId: userId.toString(),
+        staffId,
+        userId,
+        slotDate,
+        slotTime,
+        amount: totalAmount.toString(),
+        depositAmount: depositAmount.toString(),
+        paymentType: paymentType
       },
     });
 
-    // ✅ Automated cleanup: If not paid within 10 minutes, cancel and release slot
+    // Automated cleanup: If not paid within 10 minutes, release the locked slot
     setTimeout(async () => {
       try {
-        const checkApp = await appointmentModel.findById(newAppointment._id);
-        if (checkApp && !checkApp.payment) {
-          console.log("⏰ 10m Cleanup: Cancelling unpaid appointment:", newAppointment._id);
+        const checkApp = await appointmentModel.findOne({
+          staffId,
+          slotDate: new Date(`${slotDate}T00:00:00.000Z`),
+          slotTime
+        });
 
-          await appointmentModel.findByIdAndUpdate(newAppointment._id, { cancelled: true });
-
+        if (!checkApp) {
+          console.log("⏰ 10m Cleanup: Unpaid checkout detected. Releasing slot:", slotDate, slotTime);
           const busData = await businessModel.findById(staffId);
           if (busData) {
             let sb = busData.slots_booked || {};
@@ -463,13 +387,16 @@ const bookAppointment = async (req, res) => {
           }
         }
       } catch (err) {
-        console.error("Cleanup error:", err);
+        console.error("Slot cleanup error:", err);
       }
     }, 10 * 60 * 1000);
 
-    res.json({ success: true, message: "Checkout URL generated", url: session.url });
+    res.json({ success: true, message: "Redirecting to payment...", url: session.url });
 
   } catch (error) {
+    if (error.code === 11000) {
+      return res.json({ success: false, message: "Slot already taken by someone else!" });
+    }
     console.log("error:", error);
     res.json({ success: false, message: error.message });
   }
@@ -487,7 +414,6 @@ const rescheduleAppointment = async (req, res) => {
         .json({ success: false, message: "Appointment not found" });
     }
 
-    // Check if the new time slot is available
     const isAvailable = await checkSlotAvailability(
       appointment.staffId,
       slotDate,
@@ -499,14 +425,32 @@ const rescheduleAppointment = async (req, res) => {
         .json({ success: false, message: "The selected slot is unavailable" });
     }
 
-    // Update the appointment details with the new date/time
-    appointment.slotDate = new Date(slotDate); // 👈 ensure it's a Date object
+    // Release old slot and book new slot in businessModel
+    const businessData = await businessModel.findById(appointment.staffId);
+    if (businessData) {
+      let sb = businessData.slots_booked || {};
+
+      // Release old slot
+      const oldDateKey = appointment.slotDate.toISOString().split("T")[0];
+      if (sb[oldDateKey]) {
+        sb[oldDateKey] = sb[oldDateKey].filter(time => time !== appointment.slotTime);
+      }
+
+      // Book new slot
+      const newDateKey = new Date(slotDate).toISOString().split("T")[0];
+      if (sb[newDateKey]) {
+        sb[newDateKey].push(slotTime);
+      } else {
+        sb[newDateKey] = [slotTime];
+      }
+
+      await businessModel.findByIdAndUpdate(appointment.staffId, { slots_booked: sb });
+    }
+
+    appointment.slotDate = new Date(slotDate);
     appointment.slotTime = slotTime;
 
-    console.log("Received slotDate:", slotDate);
-    console.log("Received slotTime:", slotTime);
-
-    await appointment.save(); // Save the updated appointment
+    await appointment.save();
 
     res.json({
       success: true,
@@ -514,6 +458,9 @@ const rescheduleAppointment = async (req, res) => {
       appointment,
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ success: false, message: "The selected slot is already taken!" });
+    }
     console.error("Error rescheduling appointment:", error);
     res
       .status(500)
@@ -530,8 +477,6 @@ const checkSlotAvailability = async (staffId, slotDate, slotTime) => {
 
   return !existing; // Slot is available if there's NO existing appointment
 };
-
-//API to get user appointments for backend my-appointments page
 
 const listAppointment = async (req, res) => {
   try {
@@ -668,10 +613,11 @@ const cancelAppointment = async (req, res) => {
     }
 
     let slots_booked = businessData.slots_booked || {};
+    const dateKey = slotDate.toISOString().split("T")[0];
 
     // If date or time is not in the slots_booked, do nothing safely
-    if (slots_booked[slotDate]) {
-      slots_booked[slotDate] = slots_booked[slotDate].filter(
+    if (slots_booked[dateKey]) {
+      slots_booked[dateKey] = slots_booked[dateKey].filter(
         (e) => e !== slotTime,
       );
     }
@@ -767,7 +713,6 @@ const forgotPassword = async (req, res) => {
   const email = rawEmail.toLowerCase();
 
   try {
-    // 1. Validate inputs
     if (!email || !newPassword) {
       return res.status(400).json({
         success: false,
@@ -775,7 +720,6 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // 2. Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -784,7 +728,6 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // 3. Validate strong password (min 8 characters, includes uppercase, lowercase, number, special char)
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_\-+=])[A-Za-z\d@$!%*?&#^()_\-+=]{8,}$/;
     if (!passwordRegex.test(newPassword)) {
@@ -795,7 +738,6 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // 4. Check if email exists in DB
     const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(404).json({
@@ -804,11 +746,9 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // 5. Update user's password (the pre-save hook in userModel.js will handle hashing)
     user.password = newPassword;
     await user.save();
 
-    // 7. Respond with success
     res.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
     console.error("Error resetting password:", err);
@@ -819,7 +759,6 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// In controllers/userController.js
 const getApprovedFeedbacks = async (req, res) => {
   try {
     const approvedFeedbacks = await FeedbackModel.find({

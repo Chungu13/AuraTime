@@ -14,7 +14,7 @@ import nodemailer from "nodemailer";
 
 
 
-const changeAvailabilty = async (req, res) => {
+const changeAvailability = async (req, res) => {
   try {
     const { staffId } = req.body;
     const businessData = await businessModel.findById(staffId);
@@ -829,7 +829,7 @@ const getAvailableStaff = async (req, res) => {
 
 
 export {
-  changeAvailabilty,
+  changeAvailability,
   staffList,
   staffLogin,
   appointmentsStaff,

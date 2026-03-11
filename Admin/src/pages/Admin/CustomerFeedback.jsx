@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import MoveUpOnRender from "../../components/MoveUpOnRender";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const Feedback = () => {
   const { aToken, getAllFeedbacks } = useContext(AdminContext);

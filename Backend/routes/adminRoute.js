@@ -1,4 +1,4 @@
-import expres from "express";
+import express from "express";
 
 import {
   addBusiness,
@@ -28,20 +28,20 @@ import {
   generateAppointmentReports,
   getAvailableStaff,
   gettherapist,
-  getStaffAppointments
-
-
+  getStaffAppointments,
+  markAppointmentAsPaid,
+  createAdminCheckoutSession
 } from "../controllers/adminController.js";
 import upload from "../middlewares/multer.js";
 import authAdmin from "../middlewares/authAdmin.js";
-import { changeAvailabilty, deleteStaff } from "../controllers/staffController.js";
+import { changeAvailability, deleteStaff } from "../controllers/staffController.js";
 
-const adminRouter = expres.Router();
+const adminRouter = express.Router();
 
 adminRouter.post("/add-service", authAdmin, upload.single("image"), addBusiness);
 adminRouter.post("/login", loginAdmin);
 adminRouter.get("/all-staffs", authAdmin, allStaffs);
-adminRouter.post("/change-availability", authAdmin, changeAvailabilty);
+adminRouter.post("/change-availability", authAdmin, changeAvailability);
 adminRouter.post("/delete-service", authAdmin, deleteStaff);
 adminRouter.get("/appointments", authAdmin, appointmentsAdmin);
 adminRouter.post("/cancel-appointment", authAdmin, appointmentCancel);
@@ -68,5 +68,7 @@ adminRouter.get("/generatereports", authAdmin, generateAppointmentReports);
 adminRouter.get("/available", authAdmin, getAvailableStaff);
 adminRouter.get("/all-staff", authAdmin, gettherapist);
 adminRouter.get("/staff-appointments", authAdmin, getStaffAppointments);
+adminRouter.post("/mark-as-paid", authAdmin, markAppointmentAsPaid);
+adminRouter.post("/create-admin-checkout-session", authAdmin, createAdminCheckoutSession);
 
 export default adminRouter;

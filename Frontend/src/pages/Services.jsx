@@ -13,16 +13,29 @@ const Services = () => {
   const navigate = useNavigate();
 
   const applyFilter = () => {
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get("service")?.toLowerCase();
+
+    let filtered = [...staffs];
+
+    // Filter by speciality (URL param)
     if (speciality) {
-      setFilterServices(staffs.filter((doc) => doc.speciality === speciality));
-    } else {
-      setFilterServices(staffs);
+      filtered = filtered.filter((doc) => doc.speciality === speciality);
     }
+
+    // Filter by name (Query param from search bar)
+    if (searchQuery) {
+      filtered = filtered.filter((doc) =>
+        doc.service_name.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    setFilterServices(filtered);
   };
 
   useEffect(() => {
     applyFilter();
-  }, [staffs, speciality]);
+  }, [staffs, speciality, window.location.search]);
 
   return (
     <div>

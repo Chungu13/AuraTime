@@ -58,9 +58,9 @@ const TopServices = () => {
           navigate("/businesses");
           scrollTo(0, 0);
         }}
-        className="bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10"
+        className="bg-beige text-white px-12 py-3 rounded-full mt-10"
       >
-        more
+        More
       </button>
     </div>
   );

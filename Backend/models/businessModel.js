@@ -9,7 +9,7 @@ const businessSchema = new mongoose.Schema(
     about: { type: String, required: true },
     available: { type: Boolean, default: true },
     fees: { type: Number, required: true },
-    address: { type: String, required: true },
+    bookingFee: { type: Number, required: true, default: 0 }, // Upfront deposit required to book
     date: { type: Number, required: true },
     slots_booked: { type: Object, default: {} },
     serviceDuration: { type: Number, required: true }, // Adding service duration field in minutes
