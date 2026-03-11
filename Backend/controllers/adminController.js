@@ -1084,10 +1084,18 @@ const markAppointmentAsPaid = async (req, res) => {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
+    if (!appointment.staffName) {
+      return res.status(400).json({
+        success: false,
+        message: "Please assign a therapist before completing the appointment",
+      });
+    }
+
     appointment.isPaidInFull = true;
+    appointment.isCompleted = true;
     await appointment.save();
 
-    res.json({ success: true, message: "Appointment marked as paid in full (Cash)" });
+    res.json({ success: true, message: "Appointment marked as paid in full (Cash) and Completed" });
   } catch (error) {
     console.error("Error marking as paid:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -1102,6 +1110,17 @@ const createAdminCheckoutSession = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
+
+    if (!appointment.staffName) {
+      return res.status(400).json({
+        success: false,
+        message: "Please assign a therapist before completing the appointment",
+      });
+    }
+
+    // Mark as completed immediately as the admin is initiating the final payment link
+    appointment.isCompleted = true;
+    await appointment.save();
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const { amount, depositAmount, businessData, userId } = appointment;

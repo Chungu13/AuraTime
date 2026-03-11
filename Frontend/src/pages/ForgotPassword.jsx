@@ -2,7 +2,7 @@
 import { useState, useContext } from "react";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
@@ -64,23 +64,23 @@ const ForgotPassword = () => {
 
 
         <div className="w-full relative">
-        <p>Password</p>
-        <input
-        className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
-        type={showPassword ? "text" : "password"}
-        onChange={(e) => setNewPassword(e.target.value)}
-        value={newPassword}
-         required
-  />
+          <p>Password</p>
+          <input
+            className="border border-zinc-300 rounded w-full p-2 mt-1 pr-10"
+            type={showPassword ? "text" : "password"}
+            onChange={(e) => setNewPassword(e.target.value)}
+            value={newPassword}
+            required
+          />
 
-  {/* Toggle Button */}
-  <span
-    onClick={() => setShowPassword(!showPassword)}
-    className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
-  >
-    {showPassword ? "🙈" : "👁️"}
-  </span>
-</div>
+          {/* Toggle Button */}
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
 
         <button

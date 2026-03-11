@@ -28,7 +28,7 @@ const Login = () => {
           email,
         });
         if (data.success) {
-          localStorage.setItem("token", data.token);
+          sessionStorage.setItem("token", data.token);
           setToken(data.token);
           toast.success("Welcome aboard! Let's set up your profile.");
         } else {
@@ -41,7 +41,7 @@ const Login = () => {
         });
 
         if (data.success) {
-          localStorage.setItem("token", data.token);
+          sessionStorage.setItem("token", data.token);
           setToken(data.token);
           toast.success("Welcome back to AuraTime");
         } else {
@@ -59,34 +59,14 @@ const Login = () => {
   return (
     <div className="min-h-[85vh] flex items-center justify-center bg-[#FAFAF8] p-4">
       <MoveUpOnRender id="login-container">
-        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-[#E8E8E1] overflow-hidden flex flex-col md:flex-row max-w-4xl w-full">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-[#E8E8E1] overflow-hidden max-w-lg w-full">
 
-          {/* Left Side: Branding/Visual */}
-          <div className="hidden md:flex md:w-5/12 bg-[#1A1A18] p-12 flex-col justify-between text-white relative">
-            <div className="relative z-10">
-              <div className="w-12 h-12 bg-beige rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-beige/20">
-                <Sparkles size={24} className="text-[#1A1A18]" />
-              </div>
-              <h2 className="text-4xl font-bold leading-tight mb-4">Elevate your wellness experience.</h2>
-              <p className="text-gray-400 text-sm leading-relaxed">Join our community of wellness enthusiasts and book your next rejuvenation session in seconds.</p>
-            </div>
-
-            <div className="relative z-10 bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-sm">
-              <p className="text-xs font-medium text-beige uppercase tracking-widest mb-2">Premium Service</p>
-              <p className="text-sm italic text-gray-300">"The best booking experience I've ever used. Seamless and elegant."</p>
-            </div>
-
-            {/* Subtle Gradient Overlays */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-beige/10 rounded-full blur-3xl -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-beige/5 rounded-full blur-3xl -ml-32 -mb-32" />
-          </div>
-
-          {/* Right Side: Form */}
-          <form onSubmit={onSubmitHandler} className="w-full md:w-7/12 p-8 sm:p-14">
-            <div className="max-w-md mx-auto">
+          {/* Form */}
+          <form onSubmit={onSubmitHandler} className="w-full p-8 sm:p-14">
+            <div className="mx-auto">
               <div className="mb-10 text-center sm:text-left">
                 <h1 className="text-3xl font-bold text-[#1A1A18] tracking-tight mb-2">
-                  {state === "Sign Up" ? "Create Account" : "Welcome Back"}
+                  {state === "Sign Up" ? "Create Account" : "Sign In"}
                 </h1>
                 <p className="text-[#6B6B5E] text-sm font-medium">
                   {state === "Sign Up" ? "Start your journey with AuraTime" : "Enter your credentials to continue"}

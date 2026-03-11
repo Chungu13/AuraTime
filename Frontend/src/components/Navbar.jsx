@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const logout = () => {
     setToken(false);
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     navigate("/login");
   };
 

@@ -18,7 +18,7 @@ const Sidebar = () => {
             }
             to={"/admin-dashboard"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Dashboard</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Dashboard</p>
           </NavLink>
 
           <NavLink
@@ -27,7 +27,7 @@ const Sidebar = () => {
             }
             to={"/appointment-management"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Appointments & Revenue</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Appointments & Revenue</p>
           </NavLink>
 
           <NavLink
@@ -36,7 +36,7 @@ const Sidebar = () => {
             }
             to={"/all-appointments"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Admin Calendar</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Admin Calendar</p>
           </NavLink>
 
           <NavLink
@@ -45,7 +45,7 @@ const Sidebar = () => {
             }
             to={"/therapist-registration"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Add Therapist</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Add Therapist</p>
           </NavLink>
 
           <NavLink
@@ -54,7 +54,7 @@ const Sidebar = () => {
             }
             to={"/add-service"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Add Service</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Add Service</p>
           </NavLink>
 
           <NavLink
@@ -63,7 +63,7 @@ const Sidebar = () => {
             }
             to={"/service-list"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Service List</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Service List</p>
           </NavLink>
 
           <NavLink
@@ -72,7 +72,7 @@ const Sidebar = () => {
             }
             to={"/staff-registration"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Add Admin Staff</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Add Admin Staff</p>
           </NavLink>
 
           <NavLink
@@ -81,7 +81,7 @@ const Sidebar = () => {
             }
             to={"/feedback"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Customer Feedback</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Customer Feedback</p>
           </NavLink>
 
           <NavLink
@@ -90,7 +90,7 @@ const Sidebar = () => {
             }
             to={"/manage-staff"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Manage Employees</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Manage Employees</p>
           </NavLink>
 
           <NavLink
@@ -99,7 +99,7 @@ const Sidebar = () => {
             }
             to={"/analytic-dashboard"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Analytics & Reports</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Analytics & Reports</p>
           </NavLink>
         </ul>
       )}
@@ -112,7 +112,7 @@ const Sidebar = () => {
             }
             to={"/staff-dashboard"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Dashboard</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Dashboard</p>
           </NavLink>
 
           <NavLink
@@ -121,7 +121,7 @@ const Sidebar = () => {
             }
             to={"/staff-manage-appointments"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>My Appointments</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">My Appointments</p>
           </NavLink>
 
           <NavLink
@@ -130,7 +130,7 @@ const Sidebar = () => {
             }
             to={"/staff-calendar"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>My Calendar</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">My Calendar</p>
           </NavLink>
 
           <NavLink
@@ -139,7 +139,7 @@ const Sidebar = () => {
             }
             to={"/booking_page"}
           >
-            <p className="hidden md:block" style={{ fontSize: "0.8rem", fontWeight: 500, letterSpacing: "0.01em" }}>Manual Booking</p>
+            <p className="hidden md:block text-[0.8rem] font-medium tracking-[0.01em]">Manual Booking</p>
           </NavLink>
         </ul>
       )}

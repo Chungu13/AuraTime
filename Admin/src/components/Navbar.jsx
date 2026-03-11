@@ -10,9 +10,9 @@ const Navbar = () => {
   const logout = () => {
 
     aToken && setAToken("");
-    aToken && localStorage.removeItem("aToken");
+    aToken && sessionStorage.removeItem("aToken");
     dToken && setDToken("");
-    dToken && localStorage.removeItem("dToken");
+    dToken && sessionStorage.removeItem("dToken");
   };
   return (
     <div className="flex sticky top-0 bg-white/90 z-10 justify-between items-center px-4 py-2 sm:px-10 border-b bg-white">

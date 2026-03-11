@@ -16,6 +16,7 @@ const appointmentSchema = new mongoose.Schema({
   cancelled: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },
   reminderMessage: { type: String, default: "" },  // New field for reminder message
+  isDeletedByCustomer: { type: Boolean, default: false }, // New field to hide from history
 });
 
 // ✅ ADDED: Unique compound index to prevent double bookings

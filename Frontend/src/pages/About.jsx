@@ -30,9 +30,7 @@ const About = () => {
           <div className="rounded-[32px] border border-[#eaded2] bg-white/90 p-8 shadow-[0_10px_35px_rgba(90,70,50,0.06)] md:p-10">
             <div className="grid gap-6 lg:grid-cols-2">
               <div>
-                {/* <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5ebe2] text-[#8b6f5a]">
-                  <HeartHandshake size={22} />
-                </div> */}
+
 
                 <h3 className="text-xl font-semibold text-[#2c221c]">
                   What AuraTime is

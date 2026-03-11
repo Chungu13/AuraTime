@@ -12,6 +12,8 @@ import {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  deleteHistory, // Delete a single appointment
+  clearAllHistory,
   submitFeedback,
   fetchAppointmentById,
   rescheduleAppointment,
@@ -28,6 +30,7 @@ import {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const userRouter = express.Router();
+console.log("🚀 User Router Initialized with Clear All History Route");
 
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
@@ -36,6 +39,8 @@ userRouter.post("/update-profile", upload.single("image"), authUser, updateProfi
 userRouter.post("/book-appointment", authUser, bookAppointment);
 userRouter.get("/appointments", authUser, listAppointment);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
+userRouter.post("/delete-history", authUser, deleteHistory);
+userRouter.post("/clear-all-history", authUser, clearAllHistory);
 
 userRouter.post("/create-checkout-session", authUser, createCheckoutSession);
 userRouter.get("/verify-payment", verifyStripePayment);

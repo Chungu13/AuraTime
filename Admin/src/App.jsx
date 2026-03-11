@@ -6,7 +6,7 @@ import { AppContext } from "./context/AppContext";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import DashBoard from "./pages/Admin/Dashboard";
 
 import AllAppointments from "./pages/Admin/AdminCalendar.jsx";
@@ -53,7 +53,7 @@ const App = () => {
 
           <Routes>
             {/* Admin Routes */}
-            <Route path="/" element={<></>} />
+            <Route path="/" element={aToken ? <Navigate to="/admin-dashboard" /> : <Navigate to="/staff-dashboard" />} />
             <Route path="/admin-dashboard" element={<DashBoard />} />
             <Route path="/all-appointments" element={<AllAppointments />} />
             <Route path="/add-service" element={<AddService />} />
