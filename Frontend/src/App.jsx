@@ -1,8 +1,7 @@
-import { Route, Routes } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom"; // Syncing directory casing
+import { Toaster } from "sonner";
 import Home from "./pages/Home";
-import Staffs from "./pages/Staffs";
+import Services from "./pages/Services";
 import Login from "./pages/Login";
 import About from "./pages/About";
 import MyProfile from "./pages/MyProfile";
@@ -24,15 +23,40 @@ import Reviews from "./pages/Reviews";
 
 import UserInquiryChat from "./pages/Contact";
 
-import './App.css'; // with the './' if it's in src folder
+import './App.css';
 
 
-
-// Inside <Routes>
-
+import Onboarding from "./pages/Onboarding";
 
 const App = () => {
-  const { isLoading, setIsLoading } = useContext(AppContext);
+  const { isLoading, token, userData } = useContext(AppContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Onboarding Redirection Guard
+  useEffect(() => {
+    if (token && userData) {
+      const isOnboarding = location.pathname === "/onboarding";
+      const isLogin = location.pathname === "/login";
+
+      const needsOnboarding =
+        userData.gender === "Not selected" ||
+        userData.dob === "Not selected" ||
+        userData.phone === "000000000" ||
+        !userData.address?.line1 ||
+        !userData.address?.line2;
+
+      if (needsOnboarding) {
+        if (!isOnboarding) {
+          navigate("/onboarding", { replace: true });
+        }
+      } else {
+        if (isOnboarding || isLogin) {
+          navigate("/", { replace: true });
+        }
+      }
+    }
+  }, [token, userData, location.pathname, navigate]);
 
   return (
     <>
@@ -41,11 +65,12 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          <Route path="/businesses" element={<Staffs />}></Route>
-          <Route path="/businesses/:speciality" element={<Staffs />}></Route>
+          <Route path="/businesses" element={<Services />}></Route>
+          <Route path="/businesses/:speciality" element={<Services />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/about" element={<About />}></Route>
           <Route path="/contact" element={<Contact />}></Route>
+          <Route path="/onboarding" element={<Onboarding />}></Route>
           <Route path="/my-profile" element={<MyProfile />}></Route>
           <Route path="/my-appointments" element={<MyAppointments />}></Route>
           <Route path="/appointment/:staffId" element={<Appointment />}></Route>
@@ -53,41 +78,15 @@ const App = () => {
           <Route path="*" element={<div>Not found</div>} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
 
-          <Route path="/appointment/:staffId" element={<Appointment />}></Route>
-
-          <Route path="/Forgot-Password" element={<ForgotPassword/>}></Route>
-
+          <Route path="/Forgot-Password" element={<ForgotPassword />}></Route>
 
           <Route path="/Reviews" element={<Reviews />}></Route>
 
-          <Route path="/Chat" element={<UserInquiryChat/>}></Route>
+          <Route path="/Chat" element={<UserInquiryChat />}></Route>
 
-
-          
         </Routes>
         <Footer />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          toastClassName={(context) => {
-            if (context?.type === "success") {
-              return "custom-toast-success";
-            }
-            if (context?.type === "error") {
-              return "custom-toast-error";
-            }
-            return "custom-toast-default";
-          }}
-          bodyClassName="toast-body"
-        />
-
+        <Toaster position="top-right" richColors />
       </div>
     </>
   );

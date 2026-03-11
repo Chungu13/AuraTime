@@ -12,10 +12,6 @@ import ProfessionalStaffModel from "../models/ProfessionalStaffModel.js";
 
 
 
-
-
-// Register staff and admin
-
 const registerStaff = async (req, res) => {
   try {
     const { name, email: rawEmail, password, role } = req.body;
@@ -115,13 +111,13 @@ const registerProfessionalStaff = async (req, res) => {
 
 
 
-// Count staff from Admins
+
 const getStaffCount = async (req, res, next) => {
   try {
     const count = await AdminModel.countDocuments({ role: "staff" });
     res.status(200).json({ success: true, staffCount: count });
   } catch (error) {
-    next(error); // passes to your global error handler
+    next(error);
   }
 };
 
@@ -131,7 +127,7 @@ const getStaffCount = async (req, res, next) => {
 
 const getAppointmentsByDate = async (req, res) => {
   try {
-    const { slotDate } = req.body; // Expect format "YYYY-MM-DD"
+    const { slotDate } = req.body;
 
     if (!slotDate) {
       return res.status(400).json({
@@ -141,7 +137,6 @@ const getAppointmentsByDate = async (req, res) => {
     }
 
 
-    // Build UTC range
     const selectedDate = new Date(`${slotDate}T00:00:00.000Z`);
     const nextDate = new Date(selectedDate);
     nextDate.setUTCDate(selectedDate.getUTCDate() + 1);
@@ -170,7 +165,6 @@ const getAppointmentsByDate = async (req, res) => {
 
 const getAllProfessionalStaff = async (req, res) => {
   try {
-    // Find all professional staff in the collection, selecting only 'name' and 'email' fields
     const professionalStaff = await ProfessionalStaffModel.find().select("name email");
 
     if (professionalStaff.length === 0) {
@@ -182,7 +176,7 @@ const getAllProfessionalStaff = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      staff: professionalStaff, // Return both name and email fields
+      staff: professionalStaff,
     });
   } catch (error) {
     console.error("Error fetching professional staff:", error);
@@ -202,23 +196,28 @@ const addBusiness = async (req, res) => {
       speciality,
       about,
       fees,
-      address,
+      bookingFee,
       serviceDuration,
     } = req.body;
     const imageFile = req.file;
+    // Debugging logs
+    console.log("📝 Add Service Attempt:", {
+      service_name,
+      speciality,
+      about,
+      fees,
+      bookingFee,
+      serviceDuration,
+      hasImage: !!imageFile
+    });
 
-    // === Validate required fields ===
-    if (
-      !service_name ||
-      !speciality ||
-      !about ||
-      !fees ||
-      !address ||
-      !serviceDuration ||
-      !imageFile
-    ) {
-      return res.status(400).json({ success: false, message: "All fields are required." });
-    }
+    if (!service_name) return res.status(400).json({ success: false, message: "Missing Service Name" });
+    if (!speciality) return res.status(400).json({ success: false, message: "Missing Speciality" });
+    if (!about) return res.status(400).json({ success: false, message: "Missing Description (About)" });
+    if (fees === undefined || fees === "") return res.status(400).json({ success: false, message: "Missing Total Fees" });
+    if (bookingFee === undefined || bookingFee === "") return res.status(400).json({ success: false, message: "Missing Booking Fee" });
+    if (!serviceDuration) return res.status(400).json({ success: false, message: "Missing Service Duration" });
+    if (!imageFile) return res.status(400).json({ success: false, message: "Missing Service Image" });
 
     // === Validate that service_name starts with a capital letter ===
     if (!/^[A-Z]/.test(service_name)) {
@@ -228,15 +227,15 @@ const addBusiness = async (req, res) => {
       });
     }
 
-    // === Validate that serviceDuration is a number ===
-    if (isNaN(serviceDuration)) {
+
+    if (isNaN(serviceDuration) || isNaN(fees) || isNaN(bookingFee)) {
       return res.status(400).json({
         success: false,
-        message: "Service duration must be a valid number.",
+        message: "Numerical fields (Duration, Fees, Booking Fee) must be valid numbers.",
       });
     }
 
-    // === Upload image to Cloudinary ===
+
     const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
       resource_type: "image",
     });
@@ -249,8 +248,8 @@ const addBusiness = async (req, res) => {
       image: imageUrl,
       speciality,
       about,
-      fees,
-      address,
+      fees: Number(fees),
+      bookingFee: Number(bookingFee),
       serviceDuration: Number(serviceDuration),
       date: Date.now(),
     };
@@ -301,13 +300,13 @@ const loginAdmin = async (req, res) => {
   try {
     const { email: rawEmail, password } = req.body;
     const email = rawEmail.toLowerCase();
-    // Validate email format
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
       return res.json({ success: false, message: "Invalid email format" });
     }
 
-    // Validate strong password: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!password || !passwordRegex.test(password)) {
       return res.json({
@@ -347,7 +346,7 @@ const loginAdmin = async (req, res) => {
 
 
 
-// Api for get all staffs list
+
 const allStaffs = async (req, res) => {
   try {
     const staffs = await businessModel.find({}).select("-password");
@@ -361,7 +360,7 @@ const allStaffs = async (req, res) => {
 
 
 
-// API to get all appointments list
+
 const appointmentsAdmin = async (req, res) => {
   try {
     const appointments = await appointmentModel.find({});
@@ -371,12 +370,6 @@ const appointmentsAdmin = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
-
-
-
-
-
 
 
 
@@ -431,7 +424,7 @@ const appointmentComplete = async (req, res) => {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
-    // ✅ Check if the appointment is cancelled
+
     if (appointmentData.cancelled) {
       return res.status(400).json({
         success: false,
@@ -439,7 +432,7 @@ const appointmentComplete = async (req, res) => {
       });
     }
 
-    // ✅ Check if a staff is assigned
+
     if (!appointmentData.staffName) {
       return res.status(400).json({
         success: false,
@@ -447,8 +440,8 @@ const appointmentComplete = async (req, res) => {
       });
     }
 
-    // ✅ Check if today is the appointment date
-    const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+    const today = new Date().toISOString().split("T")[0];
     const appointmentDate = new Date(appointmentData.slotDate).toISOString().split("T")[0];
 
     if (today !== appointmentDate) {
@@ -458,7 +451,7 @@ const appointmentComplete = async (req, res) => {
       });
     }
 
-    // ✅ Mark the appointment as completed
+
     await appointmentModel.findByIdAndUpdate(appointmentId, {
       isCompleted: true,
     });
@@ -477,14 +470,13 @@ const appointmentComplete = async (req, res) => {
 
 
 
-// GET all feedbacks
+
 const getAllFeedbacks = async (req, res) => {
   try {
     const feedbacks = await FeedbackModel.find();
 
     console.log('Fetched feedbacks:', feedbacks);
 
-    // No need to map or populate, just return the feedbacks as is
     res.json({ success: true, feedbacks });
   } catch (error) {
     console.error("Error fetching feedbacks:", error);
@@ -504,13 +496,13 @@ const updateStaffForAppointment = async (req, res) => {
   try {
     const { appointmentId, staffId } = req.body;
 
-    // 1. Ensure the appointment exists
+
     const appointment = await appointmentModel.findById(appointmentId);
     if (!appointment) {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
-    // 2. Ensure the staff exists
+
     const staff = await ProfessionalStaffModel.findById(staffId);
     if (!staff) {
       return res.status(404).json({ success: false, message: "Staff not found" });
@@ -542,11 +534,6 @@ const updateStaffForAppointment = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
-
-
-
 
 
 
@@ -656,13 +643,13 @@ const getAppointmentTrends = async (req, res) => {
 
 
 
-// Get Service Popularity
+
 const getServicePopularity = async (req, res) => {
   try {
     const servicePopularity = await appointmentModel.aggregate([
       {
         $group: {
-          _id: "$businessData.service_name", // Group by service name
+          _id: "$businessData.service_name",
           totalAppointments: { $sum: 1 },
         },
       },
@@ -689,9 +676,20 @@ const getRevenueTrends = async (req, res) => {
   try {
     const revenueTrends = await appointmentModel.aggregate([
       {
+        $project: {
+          slotDate: 1,
+          collected: {
+            $add: [
+              { $cond: [{ $eq: ["$bookingFeePaid", true] }, "$depositAmount", 0] },
+              { $cond: [{ $eq: ["$isPaidInFull", true] }, { $subtract: ["$amount", "$depositAmount"] }, 0] }
+            ]
+          }
+        }
+      },
+      {
         $group: {
           _id: "$slotDate",
-          totalRevenue: { $sum: "$amount" },
+          totalRevenue: { $sum: "$collected" },
         },
       },
       {
@@ -719,11 +717,11 @@ const getCancellationTrends = async (req, res) => {
   try {
     const cancellationTrends = await appointmentModel.aggregate([
       {
-        $match: { cancelled: true }, // Only cancelled appointments
+        $match: { cancelled: true },
       },
       {
         $group: {
-          _id: "$slotDate", // Group by slotDate
+          _id: "$slotDate",
           totalCancellations: { $sum: 1 },
         },
       },
@@ -732,7 +730,7 @@ const getCancellationTrends = async (req, res) => {
       },
     ]);
 
-    console.log("cancelled Trends:", cancellationTrends);  // Log the data here
+    console.log("cancelled Trends:", cancellationTrends);
 
     res.json({
       success: true,
@@ -779,11 +777,11 @@ const getAppointmentTypeTrends = async (req, res) => {
 
 const getAllFrontStaff = async (req, res) => {
   try {
-    const staff = await AdminModel.find(); // Fetch all staff from the AdminModel
-    console.log("Fetched Front Staff: ", staff);  // Ensure you're getting the correct staff data
+    const staff = await AdminModel.find();
+    console.log("Fetched Front Staff: ", staff);
     res.status(200).json({
       success: true,
-      frontstaff: staff,  // Ensure you're sending the data with this key
+      frontstaff: staff,
     });
   } catch (error) {
     console.log("Error fetching all staff/admins:", error);
@@ -797,18 +795,18 @@ const getAllFrontStaff = async (req, res) => {
 
 
 
-// Delete staff (admin or regular staff)
+
 const deleteFrontStaff = async (req, res) => {
   try {
     const { staffId } = req.body;
 
-    // Check if staff exists
+
     const staff = await AdminModel.findById(staffId);
     if (!staff) {
       return res.status(404).json({ success: false, message: "Admin not found" });
     }
 
-    // Delete the admin
+
     await AdminModel.findByIdAndDelete(staffId);
     res.json({ success: true, message: "Admin deleted successfully" });
   } catch (error) {
@@ -819,18 +817,18 @@ const deleteFrontStaff = async (req, res) => {
 
 
 
-// Delete professional staff (therapist)
+
 const deleteProfessionalStaff = async (req, res) => {
   try {
     const { staffId } = req.body;
 
-    // Check if professional staff exists
+
     const staff = await ProfessionalStaffModel.findById(staffId);
     if (!staff) {
       return res.status(404).json({ success: false, message: "Therapist not found" });
     }
 
-    // Delete the professional staff
+
     await ProfessionalStaffModel.findByIdAndDelete(staffId);
     res.json({ success: true, message: "Therapist deleted successfully" });
   } catch (error) {
@@ -860,23 +858,23 @@ const getReports = async (req, res) => {
     };
 
     appointments.forEach(app => {
-      // Service Trends
+
       const service = app.businessData.service_name || "Unknown";
       reportData.serviceTrends[service] = (reportData.serviceTrends[service] || 0) + 1;
 
-      // Revenue
+
       if (app.payment && !app.cancelled) {
         reportData.revenue += app.amount;
       }
 
-      // Completed & Cancelled
+
       if (app.cancelled) reportData.cancellations += 1;
       if (app.isCompleted) reportData.completed += 1;
 
-      // Peak Times
+
       reportData.peakTimes[app.slotTime] = (reportData.peakTimes[app.slotTime] || 0) + 1;
 
-      // Peak Days
+
       const day = new Date(app.slotDate).toLocaleDateString("en-US", { weekday: "long" });
       reportData.peakDays[day] = (reportData.peakDays[day] || 0) + 1;
     });
@@ -895,21 +893,21 @@ const getReports = async (req, res) => {
 const generateAppointmentReports = async (req, res) => {
   try {
     const allAppointments = await appointmentModel.find();
-    const allUsers = await userModel.find(); // Get all registered users
+    const allUsers = await userModel.find();
 
-    // Total users
+
     const totalUsers = allUsers.length;
 
-    // Total appointments
+
     const totalAppointments = allAppointments.length;
 
-    // Completed appointments
+
     const completedAppointments = allAppointments.filter(a => a.isCompleted).length;
 
-    // Cancelled appointments
+
     const cancelledAppointments = allAppointments.filter(a => a.cancelled).length;
 
-    // Paid appointments (online bookings)
+
     const paidAppointments = allAppointments.filter(a => a.payment).length;
 
     const totalEarnings = allAppointments.reduce((sum, a) => {
@@ -921,12 +919,12 @@ const generateAppointmentReports = async (req, res) => {
 
 
 
-    // Appointments this week (Monday to Sunday)
+
     const now = new Date();
     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1)); // Monday
     startOfWeek.setHours(0, 0, 0, 0);
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
     console.log("Start of Week:", startOfWeek.toISOString());
@@ -942,7 +940,7 @@ const generateAppointmentReports = async (req, res) => {
 
 
 
-    // Most booked service
+
     const serviceCount = {};
     allAppointments.forEach(a => {
       const service = a.businessData?.service_name;
@@ -956,7 +954,7 @@ const generateAppointmentReports = async (req, res) => {
       ["None", 0]
     );
 
-    // Count of users who booked online (payment === true)
+
     const onlineBookings = new Set(
       allAppointments.filter(a => a.payment).map(a => a.user?._id?.toString())
     ).size;
@@ -1077,6 +1075,81 @@ const getStaffAppointments = async (req, res) => {
 
 
 
+const markAppointmentAsPaid = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    appointment.isPaidInFull = true;
+    await appointment.save();
+
+    res.json({ success: true, message: "Appointment marked as paid in full (Cash)" });
+  } catch (error) {
+    console.error("Error marking as paid:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const createAdminCheckoutSession = async (req, res) => {
+  const { appointmentId, payment_type = "full" } = req.body;
+
+  try {
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const { amount, depositAmount, businessData, userId } = appointment;
+
+    let chargingAmount;
+    let productName;
+    if (payment_type === "full") {
+      chargingAmount = amount - depositAmount;
+      productName = `Final Payment - ${businessData.service_name}`;
+    } else {
+      chargingAmount = depositAmount;
+      productName = `Booking Deposit - ${businessData.service_name}`;
+    }
+
+    const amountInCents = Math.round(chargingAmount * 100);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: productName,
+              description: `Admin initiated payment for ${appointment.userData.name}. Total: $${amount}.`
+            },
+            unit_amount: amountInCents,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&appointmentId=${appointmentId}&payment_type=${payment_type}`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      metadata: {
+        appointmentId: appointmentId,
+        userId: userId ? userId.toString() : "",
+        paymentType: payment_type
+      },
+    });
+
+    res.json({ success: true, url: session.url });
+  } catch (error) {
+    console.error("Admin checkout error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
   getStaffAppointments,
   gettherapist,
@@ -1106,6 +1179,7 @@ export {
   deleteProfessionalStaff,
   toggleFeedbackApproval,
   getReports,
-  generateAppointmentReports
-
+  generateAppointmentReports,
+  markAppointmentAsPaid,
+  createAdminCheckoutSession,
 };

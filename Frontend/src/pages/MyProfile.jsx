@@ -16,8 +16,15 @@ const MyProfile = () => {
     try {
       const formData = new FormData();
       formData.append("name", userData.name);
-      formData.append("phone", userData.phone);
-      formData.append("address", JSON.stringify(userData.address));
+
+      // Clean and format phone for Zambia
+      const cleanPhone = userData.phone.replace(/\+260/g, '').replace(/\s/g, '');
+      if (!/^(97|96|95|77|76|75)\d{7}$/.test(cleanPhone)) {
+        return toast.error("Please enter a valid 9-digit Zambian mobile number (e.g., 971 234 567)");
+      }
+      formData.append("phone", `+260${cleanPhone}`);
+
+      formData.append("address", JSON.stringify({ line1: userData.address.line1, line2: "N/A" }));
       formData.append("gender", userData.gender);
       formData.append("dob", userData.dob);
       image && formData.append("image", image);
@@ -102,17 +109,22 @@ const MyProfile = () => {
               <div className="flex gap-4">
                 <p className="w-24 font-medium">Phone:</p>
                 {isEdit ? (
-                  <input
-                    className="bg-gray-100 px-2 py-1 rounded"
-                    value={userData.phone}
-                    type="text"
-                    onChange={(e) =>
-                      setUserData((prev) => ({
-                        ...prev,
-                        phone: e.target.value,
-                      }))
-                    }
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500 font-bold">+260</span>
+                    <input
+                      className="bg-gray-100 px-2 py-1 rounded w-full"
+                      value={userData.phone.replace(/\+260/g, '')}
+                      type="text"
+                      placeholder="971 234 567"
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9 ]/g, '');
+                        setUserData((prev) => ({
+                          ...prev,
+                          phone: val,
+                        }));
+                      }}
+                    />
+                  </div>
                 ) : (
                   <p>{userData.phone}</p>
                 )}
@@ -120,42 +132,23 @@ const MyProfile = () => {
               <div className="flex gap-4">
                 <p className="w-24 font-medium">Address:</p>
                 {isEdit ? (
-                  <div className="flex flex-col gap-1">
-                    <input
-                      className="bg-gray-100 px-2 py-1 rounded"
-                      value={userData.address?.line1}
-                      type="text"
-                      onChange={(e) =>
-                        setUserData((prev) => ({
-                          ...prev,
-                          address: {
-                            ...prev.address,
-                            line1: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                    <input
-                      className="bg-gray-100 px-2 py-1 rounded"
-                      value={userData.address?.line2}
-                      type="text"
-                      onChange={(e) =>
-                        setUserData((prev) => ({
-                          ...prev,
-                          address: {
-                            ...prev.address,
-                            line2: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                  </div>
+                  <input
+                    className="bg-gray-100 px-2 py-1 rounded w-full"
+                    placeholder="Physical Address"
+                    value={userData.address?.line1}
+                    type="text"
+                    onChange={(e) =>
+                      setUserData((prev) => ({
+                        ...prev,
+                        address: {
+                          ...prev.address,
+                          line1: e.target.value,
+                        },
+                      }))
+                    }
+                  />
                 ) : (
-                  <p>
-                    {userData.address.line1}
-                    <br />
-                    {userData.address.line2}
-                  </p>
+                  <p>{userData.address.line1}</p>
                 )}
               </div>
             </div>

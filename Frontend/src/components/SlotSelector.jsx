@@ -1,78 +1,96 @@
-import { useEffect, useRef } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Import arrow icons
+import { useRef } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const SlotSelector = ({ staffSlots, slotIndex, slotTime, setSlotTime }) => {
   const containerRef = useRef(null);
 
-  // Auto-scroll to last item on load
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollLeft = containerRef.current.scrollWidth;
-    }
-  }, [staffSlots]);
+  const currentSlots = staffSlots?.[slotIndex] || [];
 
-  // Function to scroll left
   const scrollLeft = () => {
     if (containerRef.current) {
       containerRef.current.scrollBy({
-        left: containerRef.current.scrollLeft > 0 && -200,
+        left: -220,
         behavior: "smooth",
       });
     }
   };
 
-  // Function to scroll right
   const scrollRight = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: 200, behavior: "smooth" });
+      containerRef.current.scrollBy({
+        left: 220,
+        behavior: "smooth",
+      });
     }
   };
 
+  const hasNoAvailableSlots =
+    currentSlots.length === 0 ||
+    currentSlots.every((item) => !item?.time);
+
   return (
-    <div className="flex items-center relative w-full mt-4">
-      {/* Left Arrow Button */}
-      <div className="flex mr-2">
-        <button
-          className="p-2 bg-beige-100 rounded-full shadow-md hover:bg-beige transition"
-          onClick={scrollLeft}
-        >
-          <FaChevronLeft size={15} />
-        </button>
+    <div className="w-full mt-5">
+      <div className="mb-3">
+        <h3 className="text-sm font-semibold text-slate-900">Available Time Slots</h3>
+        <p className="text-xs text-slate-500 mt-1">
+          Select a time that works best for this appointment.
+        </p>
       </div>
 
-      {/* Scrollable Slots Container */}
+      <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        {/* Left arrow */}
+        <button
+          type="button"
+          onClick={scrollLeft}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+        >
+          <FaChevronLeft size={14} />
+        </button>
 
-      <div className="overflow-x-hidden">
+        {/* Slots */}
         <div
           ref={containerRef}
-          className="flex items-center gap-3 w-full overflow-x-hidden  snap-x snap-mandatory  px-8 py-2 scrollbar-hide"
+          className="flex flex-1 items-center gap-3 overflow-x-auto scroll-smooth scrollbar-hide"
         >
-          {staffSlots.length > 0 &&
-            staffSlots[slotIndex].map((item, index) => (
-              <p
-                onClick={() => setSlotTime(item?.time)}
-                className={`text-sm font-light  flex-shrink-0 px-5 py-2 rounded-full cursor-pointer snap-end ${
-                  item.time === slotTime
-                    ? "bg-beige text-white"
-                    : "text-black border border-gray-700"
-                }`}
-                key={index}
-              >
-                {item.time === false
-                  ? "No slot available"
-                  : item?.time?.toLowerCase()}
-              </p>
-            ))}
-        </div>
-      </div>
+          {hasNoAvailableSlots ? (
+            <div className="flex min-h-[44px] items-center rounded-full border border-dashed border-slate-300 bg-slate-50 px-4 text-sm text-slate-500">
+              No slots available
+            </div>
+          ) : (
+            currentSlots.map((item, index) => {
+              const isSelected = item?.time === slotTime;
+              const isUnavailable = !item?.time;
 
-      {/* Right Arrow Button */}
-      <div className="flex ml-2">
+              return (
+                <button
+                  type="button"
+                  key={index}
+                  onClick={() => !isUnavailable && setSlotTime(item.time)}
+                  disabled={isUnavailable}
+                  className={[
+                    "shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition",
+                    "border whitespace-nowrap",
+                    isUnavailable
+                      ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                      : isSelected
+                        ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300",
+                  ].join(" ")}
+                >
+                  {item?.time?.toLowerCase()}
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Right arrow */}
         <button
-          className=" p-2 bg-gray-100 rounded-full shadow-md hover:bg-beige transition "
+          type="button"
           onClick={scrollRight}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
         >
-          <FaChevronRight size={15} />
+          <FaChevronRight size={14} />
         </button>
       </div>
     </div>

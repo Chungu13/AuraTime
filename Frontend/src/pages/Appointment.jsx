@@ -2,8 +2,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
-import RelatedDoctors from "../components/RelatedDoctors";
-import { toast } from "react-toastify";
+import RelatedServices from "../components/RelatedServices";
+import { toast } from "sonner";
 import axios from "axios";
 import SlotSelector from "../components/SlotSelector";
 
@@ -12,18 +12,17 @@ const Appointment = () => {
   const location = useLocation();
   const { staffs, currencySymbol, token, backendUrl, getStaffsData } =
     useContext(AppContext);
-  const daysOfWeek = ["SUN", "MON", "TUE", "WEND", "THE", "FRI", "SAT"];
+  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const [staffInfo, setStaffInfo] = useState(null);
   const [staffSlots, setStaffSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
-  const [slotDate, setSlotDate] = useState(""); // Store the selected date for rescheduling
-  const [existingAppointment, setExistingAppointment] = useState(null); // Store existing appointment if rescheduling
+  const [slotDate, setSlotDate] = useState("");
+  const [existingAppointment, setExistingAppointment] = useState(null);
   const [serviceDuration, setServiceDuration] = useState(30);
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
-  // Check if the user is rescheduling an appointment
   const isReschedule = new URLSearchParams(location.search).get("reschedule");
   const appointmentId = new URLSearchParams(location.search).get(
     "appointmentId",
@@ -43,7 +42,6 @@ const Appointment = () => {
     getAvailableSlots();
   }, [staffInfo]);
 
-  // Fetch the existing appointment if rescheduling
   useEffect(() => {
     if (isReschedule && appointmentId) {
       fetchExistingAppointment(appointmentId);
@@ -54,15 +52,16 @@ const Appointment = () => {
     const staffInfo = staffs.find((doc) => doc._id === staffId);
 
     if (!staffInfo) {
-      console.warn("No staff found for ID:", staffId);
-      return; // stop the function early if not found
+      if (staffs.length > 0) {
+        console.warn("No staff found for ID:", staffId);
+      }
+      return;
     }
 
     setStaffInfo(staffInfo);
     setServiceDuration(staffInfo.serviceDuration || 30);
   };
 
-  // Fetch existing appointment details for rescheduling
   const fetchExistingAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.get(
@@ -71,79 +70,24 @@ const Appointment = () => {
       );
 
       if (data.success) {
-        setExistingAppointment(data.appointment); // Set existing appointment details
-        setSlotTime(data.appointment.slotTime); // Pre-fill the time slot
-        setSlotDate(data.appointment.slotDate); // Pre-fill the date slot
+        setExistingAppointment(data.appointment);
+        setSlotTime(data.appointment.slotTime);
+        setSlotDate(data.appointment.slotDate);
       }
     } catch (error) {
       toast.error("Failed to fetch appointment details");
     }
   };
 
-  // Check if a slot is available
   const checkSlotAvailable = (staffInfo, slotDate, slotTime) => {
-    if (!staffInfo || !staffInfo.slots_booked) return true; // If doctor info is null
+    if (!staffInfo || !staffInfo.slots_booked) return true;
     return !staffInfo.slots_booked?.[slotDate]?.includes(slotTime);
   };
-
-  //  // Get available slots
-  //   const getAvailableSlots = async () => {
-  //     setStaffSlots([]);
-
-  //     const today = new Date();
-  //     const generateSlotDate = (date) => date.toISOString(); // full ISO date (not used directly for slotKey)
-
-  //     for (let i = 0; i < 7; i++) {
-
-  //       const slotKey = currentDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
-  //       const isAvailable = checkSlotAvailable(staffInfo, slotKey, formattedTime);
-
-  //       currentDate.setDate(today.getDate() + i);
-
-  //       const endTime = new Date(currentDate);
-  //       endTime.setHours(21, 0, 0, 0);
-
-  //       if (i === 0) {
-  //         currentDate.setHours(Math.max(currentDate.getHours() + 1, 10));
-  //         currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
-  //       } else {
-  //         currentDate.setHours(10, 0, 0, 0);
-  //       }
-
-  //       const timeSlots = [];
-  //       while (currentDate < endTime) {
-  //         const formattedTime = currentDate.toLocaleTimeString([], {
-  //           hour: "2-digit",
-  //           minute: "2-digit",
-  //         });
-
-  //         const slotDate = generateSlotDate(currentDate);
-  //         const isAvailable = checkSlotAvailable(staffInfo, slotDate, formattedTime);
-
-  //         if (isAvailable) {
-  //           timeSlots.push({
-  //             datetime: new Date(currentDate),
-  //             time: formattedTime,
-  //           });
-  //         }
-
-  //         // **Use serviceDuration to adjust the slot intervals**
-  //         currentDate.setMinutes(currentDate.getMinutes() + serviceDuration); // Adjust the slot time by serviceDuration
-  //       }
-
-  //       if (timeSlots.length === 0) {
-  //         timeSlots.push({ datetime: new Date(currentDate), time: false });
-  //       }
-
-  //       setStaffSlots((prev) => [...prev, timeSlots]);
-  //     }
-  //   };
 
   const getAvailableSlots = async () => {
     setStaffSlots([]);
 
     const today = new Date();
-    const generateSlotDate = (date) => date.toISOString(); // new ISO formatter
 
     for (let i = 0; i < 7; i++) {
       const currentDate = new Date(today);
@@ -166,7 +110,7 @@ const Appointment = () => {
           minute: "2-digit",
         });
 
-        const slotKey = currentDate.toISOString().split("T")[0]; // match backend format
+        const slotKey = currentDate.toISOString().split("T")[0];
         const isAvailable = checkSlotAvailable(
           staffInfo,
           slotKey,
@@ -191,28 +135,35 @@ const Appointment = () => {
     }
   };
 
+  const [isBooking, setIsBooking] = useState(false);
   const bookAppointment = async () => {
+    console.log("🚀 bookAppointment triggered", { token: !!token, slotTime, slotIndex });
     if (!token) {
+      console.log("❌ No token, redirecting to login");
       toast.warn("Login to book appointment");
       return navigate("/login");
     }
 
     if (!slotTime) {
+      console.log("❌ No slotTime selected");
       return toast.error("Please select the slot time");
     }
 
+    setIsBooking(true);
     try {
-      const date = staffSlots[slotIndex][0].datetime;
-      const slotDate = date.toISOString().split("T")[0]; // ✅ "YYYY-MM-DD"
+      if (!staffSlots[slotIndex] || !staffSlots[slotIndex][0]) {
+        throw new Error("Date information is missing for the selected slot.");
+      }
 
-      console.log("Booking Slot Date:", slotDate);
-      console.log("Booking Slot Time:", slotTime);
+      const date = staffSlots[slotIndex][0].datetime;
+      const slotDate = date.toISOString().split("T")[0];
+      console.log("📅 Slot Info:", { slotDate, slotTime, staffId });
 
       const { data } = await axios.post(
         backendUrl +
-          (isReschedule
-            ? "/api/user/reschedule-appointment"
-            : "/api/user/book-appointment"),
+        (isReschedule
+          ? "/api/user/reschedule-appointment"
+          : "/api/user/book-appointment"),
         {
           staffId,
           slotDate,
@@ -222,60 +173,28 @@ const Appointment = () => {
         { headers: { token } },
       );
 
+      console.log("📦 Backend Response:", data);
+
       if (data.success) {
-        toast.success(data.message);
-        getStaffsData();
-        navigate("/my-appointments");
+        if (data.url) {
+          console.log("🔗 Redirecting to Stripe:", data.url);
+          toast.info(data.message || "Redirecting to secure payment...");
+          window.location.href = data.url;
+        } else {
+          toast.success(data.message || "Appointment booked successfully");
+          getStaffsData();
+          navigate("/my-appointments");
+        }
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log("error:", error);
-      toast.error(error.message);
+      console.error("🔥 Booking Error:", error);
+      toast.error(error.response?.data?.message || error.message || "Booking failed. Please try again.");
+    } finally {
+      setIsBooking(false);
     }
   };
-
-  // // Book an appointment (or reschedule an existing one)
-  // const bookAppointment = async () => {
-  //   if (!token) {
-  //     toast.warn("Login to book appointment");
-  //     return navigate("/login");
-  //   }
-
-  //   if (!slotTime) {
-  //     return toast.error("Please select the slot time");
-  //   }
-
-  //   try {
-  //     const date = staffSlots[slotIndex][0].datetime;
-  //     const slotDate = date.toISOString(); // ✅ Sends slotDate as a real Date object
-
-  //     console.log("Booking Slot Date:", slotDate); // Add a log to ensure slotDate is set correctly
-  //     console.log("Booking Slot Time:", slotTime); // Add a log to ensure slotTime is set correctly
-
-  //     const { data } = await axios.post(
-  //       backendUrl + (isReschedule ? "/api/user/reschedule-appointment" : "/api/user/book-appointment"),
-  //       {
-  //         staffId,
-  //         slotDate,
-  //         slotTime,
-  //         appointmentId: existingAppointment ? existingAppointment._id : null,
-  //       },
-  //       { headers: { token } }
-  //     );
-
-  //     if (data.success) {
-  //       toast.success(data.message);
-  //       getStaffsData();
-  //       navigate("/my-appointments");
-  //     } else {
-  //       toast.error(data.message);
-  //     }
-  //   } catch (error) {
-  //     console.log("error:", error);
-  //     toast.error(error.message);
-  //   }
-  // };
 
   return (
     staffInfo && (
@@ -298,15 +217,6 @@ const Appointment = () => {
             <div className="flex items-center gap-2 text-sm mt-1 text-black">
               <p>{staffInfo.speciality}</p>
             </div>
-            <div className="flex items-center gap-2 text-sm mt-1 text-black">
-              <p>{staffInfo.address}</p>
-            </div>
-            {/* <div className="flex items-center gap-2 text-sm mt-1 text-black">
-              <p>
-                {staffInfo.therapist_staff_email}  {staffInfo.speciality}
-              </p>
-              
-            </div> */}
 
             <div>
               <p className="flex items-center gap-1 text-sm font-medium text-black mt-3">
@@ -323,6 +233,16 @@ const Appointment = () => {
                 {staffInfo.fees}
               </span>
             </p>
+
+            {staffInfo.bookingFee > 0 && (
+              <p className="text-green-700 font-semibold mt-2 text-sm bg-green-50 px-3 py-1 rounded-md inline-block">
+                Upfront Deposit: {currencySymbol}{staffInfo.bookingFee}
+                <span className="font-normal text-xs block text-green-600 mt-0.5">
+                  (Payable via Stripe to secure your slot)
+                </span>
+              </p>
+            )}
+
             <p className="text-black font-medium mt-4">
               Service Duration:{" "}
               <span className="text-gray-600">
@@ -335,22 +255,35 @@ const Appointment = () => {
         {/* Booking Slots */}
         <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
           <p>Booking slots</p>
-          <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
-            {staffSlots.length &&
-              staffSlots.map((item, index) => (
-                <div
-                  onClick={() => setSlotIndex(index)}
-                  className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                    slotIndex === index
-                      ? "bg-beige text-white"
-                      : "border border-gray-700"
-                  }`}
-                  key={index}
-                >
-                  <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
-                  <p>{item[0] && item[0].datetime.getDate()}</p>
-                </div>
-              ))}
+          <div className="flex gap-3 items-center w-full overflow-x-auto mt-4 pb-2 scrollbar-hide">
+            {staffSlots.length > 0 &&
+              staffSlots.map((item, index) => {
+                const isSelected = slotIndex === index;
+                const dayLabel = item[0] && daysOfWeek[item[0].datetime.getDay()];
+                const dayNumber = item[0] && item[0].datetime.getDate();
+
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setSlotIndex(index)}
+                    key={index}
+                    className={`flex min-w-[78px] shrink-0 flex-col items-center justify-center rounded-2xl border px-4 py-3 text-center transition ${isSelected
+                      ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                      }`}
+                  >
+                    <span
+                      className={`text-[11px] font-semibold tracking-wide ${isSelected ? "text-white/80" : "text-slate-500"
+                        }`}
+                    >
+                      {dayLabel}
+                    </span>
+                    <span className="mt-1 text-lg font-semibold">
+                      {dayNumber}
+                    </span>
+                  </button>
+                );
+              })}
           </div>
 
           <SlotSelector
@@ -360,15 +293,42 @@ const Appointment = () => {
             setSlotTime={setSlotTime}
           />
           <button
+            type="button"
+            disabled={isBooking}
             onClick={bookAppointment}
-            className="bg-beige text-white text-sm font-light px-14 py-3  hover:bg-stone-700 rounded-full my-5"
+            className={`text-white text-sm font-semibold px-14 py-4 rounded-full my-5 shadow-lg transition-all flex items-center justify-center gap-3 ${isBooking ? "bg-gray-400 cursor-not-allowed" : "bg-beige hover:bg-stone-700 hover:scale-[1.02] active:scale-95"}`}
           >
-            {isReschedule ? "Reschedule Appointment" : "Book an appointment"}
+            {isBooking ? (
+              <>
+                <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Connecting to Stripe...
+              </>
+            ) : isReschedule ? (
+              "Confirm Reschedule"
+            ) : staffInfo.bookingFee > 0 ? (
+              <>
+                <span className="flex items-center gap-1">
+                  Pay {currencySymbol}{staffInfo.bookingFee} Deposit
+                </span>
+                <span className="h-4 w-[1px] bg-white/30 hidden sm:block" />
+                <span>Confirm Booking</span>
+              </>
+            ) : staffInfo.fees > 0 ? (
+              <>
+                <span className="flex items-center gap-1">
+                  Pay {currencySymbol}{staffInfo.fees}
+                </span>
+                <span className="h-4 w-[1px] bg-white/30 hidden sm:block" />
+                <span>Pay & Book Now</span>
+              </>
+            ) : (
+              "Booking Unavailable"
+            )}
           </button>
         </div>
 
-        {/* Related Doctors */}
-        <RelatedDoctors staffId={staffId} speciality={staffInfo.speciality} />
+        {/* Related Services */}
+        <RelatedServices staffId={staffId} speciality={staffInfo.speciality} />
       </div>
     )
   );

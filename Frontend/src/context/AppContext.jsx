@@ -1,6 +1,6 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react"; // Syncing directory casing
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const AppContext = createContext();
 
@@ -8,7 +8,6 @@ const AppContextProvider = (props) => {
   const currencySymbol = "$";
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoading, setIsLoading] = useState(false);
-  console.log("isLoading:", isLoading);
   const [staffs, setStaffs] = useState([]);
   const [token, setToken] = useState(
     localStorage.getItem("token") ? localStorage.getItem("token") : ""
@@ -18,17 +17,17 @@ const AppContextProvider = (props) => {
   const getStaffsData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/staff/list");
-      console.log("data:", data);
       if (data.success) {
         setStaffs(data.staffs);
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error.message);
+      toast.error("Failed to load staff data");
     }
   };
 
   const loadUserProfileData = async () => {
+    if (!token) return;
     try {
       const { data } = await axios.get(backendUrl + "/api/user/get-profile", {
         headers: { token },
@@ -41,7 +40,7 @@ const AppContextProvider = (props) => {
       }
     } catch (error) {
       console.log("error:", error);
-      toast.error(error.message);
+      toast.error("Session expired or connection failed");
     }
   };
 
@@ -79,6 +78,7 @@ const AppContextProvider = (props) => {
         return config;
       },
       (error) => {
+        setIsLoading(false);
         return Promise.reject(error);
       }
     );
