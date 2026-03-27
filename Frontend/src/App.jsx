@@ -13,7 +13,6 @@ import Footer from "./components/Footer";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./context/AppContext";
 import axios from "axios";
-import TopLoadingBar from "./components/TopLoadingBar";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import FeedbackForm from "./pages/MyFeedback"
@@ -30,7 +29,7 @@ import './App.css';
 import Onboarding from "./pages/Onboarding";
 
 const App = () => {
-  const { isLoading, token, userData } = useContext(AppContext);
+  const { token, userData } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +60,6 @@ const App = () => {
 
   return (
     <>
-      {isLoading && <TopLoadingBar message="Loading ..." />}
       <div className="mx-4 sm:mx-[10%]">
         <Navbar />
         <Routes>
