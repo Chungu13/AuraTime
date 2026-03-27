@@ -28,6 +28,16 @@
 
 ---
 
+## 🎥 Demo
+
+[![AuraTime Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+> Covers the full customer booking flow and how real-time availability prevents double bookings across concurrent sessions.
+
+*Replace `YOUR_VIDEO_ID` with your YouTube/Loom video ID before publishing.*
+
+---
+
 ## 🧩 Problem & Solution
 
 Beauty and wellness SMEs often lose bookings and revenue to manual scheduling — phone calls, paper diaries, double bookings, and no visibility into business performance.
@@ -62,26 +72,27 @@ AuraTime solves this with a three-portal system: customers book online in real t
 
 ## ✨ Features
 
-### Customer Portal
+> Access is controlled via JWT-based RBAC. Each role sees only what's relevant to their function.
+
+### 🧖 Customer — Self-service booking
 - Browse services and book appointments with live availability
 - Secure registration and JWT-authenticated sessions
 - View, reschedule, and cancel upcoming appointments
 - Stripe-powered payment checkout
 - Leave ratings and reviews for completed services
 
-### Staff Portal
-- Personalised dashboard with daily schedule overview
-- Interactive calendar for managing personal availability
-- Create walk-in appointments manually for in-person customers
-- Automated reminders for upcoming sessions
-- Access to customer feedback and performance ratings
+### 🗂️ Front Desk Staff — Day-to-day operations
+- View and manage all upcoming appointments
+- Create walk-in bookings for in-person customers
+- Handle reschedules and cancellations on behalf of customers
+- Send appointment reminders
 
-### Admin Portal
-- Manage users, staff, and role assignments
+### 👑 Admin (Business Owner) — Full oversight
+- Everything front desk staff can do, plus:
+- Manage staff accounts and role assignments
 - Configure and price services
-- Monitor all bookings, cancellations, and system activity
-- Revenue dashboard with real-time financial tracking
-- Generate reports on booking trends and staff performance
+- Monitor all bookings and system-wide activity
+- Access revenue dashboards and business performance reports
 
 ---
 
