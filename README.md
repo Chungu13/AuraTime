@@ -1,108 +1,131 @@
+# AuraTime — Appointment Management for Beauty & Wellness
 
-# AuraTime - Appointment Management for Beauty & Wellness SMEs
+> A full-stack booking platform that helps beauty and wellness SMEs replace manual scheduling with automated online appointment management.
 
-Developed as my final year project, **AuraTime** is a comprehensive appointment management system designed to help small and medium businesses in the beauty and wellness industry transition from manual scheduling to efficient online booking. The platform reduces administrative overhead while improving customer experience through real-time availability tracking and automated management across three role-based portals.
-
-## Problem Statement
-
-Beauty and wellness SMEs often struggle with:
-- Manual scheduling leading to double bookings and errors
-- Time-consuming phone-based appointment management
-- Lack of visibility into business performance and revenue trends
-- Difficulty managing staff schedules and availability
-
-AuraTime addresses these challenges through an integrated digital solution.
-
-## Key Features
-
-### Customer Portal
-- **Seamless Booking Experience:** Browse services and book appointments with real-time availability
-- **Account Management:** Secure registration, authentication, and profile management
-- **Appointment Control:** View, reschedule, or cancel upcoming appointments
-- **Secure Payments:** Integrated Stripe payment processing
-- **Service Feedback:** Rate and review services to help improve quality
-
-### Staff Portal
-- **Personalized Dashboard:** Daily schedule overview and upcoming session notifications
-- **Interactive Calendar:** Manage personal availability and view bookings at a glance
-- **Walk-in Support:** Create manual appointments for customers without online access
-- **Smart Reminders:** Automated notifications for upcoming appointments
-- **Performance Insights:** Access customer feedback and ratings
-
-### Admin Portal
-- **Centralized Management:** Oversee users, staff, and role assignments
-- **Service Configuration:** Define, categorize, and price services
-- **Booking Oversight:** Monitor all appointments, cancellations, and system activity
-- **Business Intelligence:** Generate reports on revenue, booking trends, and staff performance
-- **Revenue Dashboard:** Real-time financial tracking and analytics
-
-## Project Structure
-
-AuraTime is built as a full-stack application with the following components:
-
-- **Backend**: Node.js + Express API with MongoDB.
-- **Frontend**: React + Vite customer portal.
-- **Admin**: React + Vite administration dashboard for both admins and staff.
-
-## Prerequisites
-
-- Node.js (v18+ recommended)
-- MongoDB (Atlas or local instance)
-- Cloudinary Account (for image uploads)
-- Stripe Account (for payments)
-
-## Live Demo
-**[View Live Application]((https://aura-time-blond.vercel.app/))**
-
-The application is fully deployed and accessible:
-- **Frontend (Customer Portal):** Vercel - [https://aura-time-blond.vercel.app/]
-- **Admin Portal:** Vercel - [https://aura-time-admin.vercel.app/]
-- **Backend API:** Render - [https://auratime.onrender.com]
-- **Database:** MongoDB Atlas
-
-**Demo Credentials:**
-```
-Admin Login:
-Email: admin@auratime.com
-Password: SuperSecure!1
-
-Staff Login:
-Email: staff@auratime.com
-Password: Passowrd@1234
-
-Customer Login:
-Email: customer@auratime.com
-Password: Customer@1234!
-```
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Customer%20Portal-brightgreen)](https://aura-time-blond.vercel.app/)
+[![Admin Portal](https://img.shields.io/badge/Live%20Demo-Admin%20Portal-blue)](https://aura-time-admin.vercel.app/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react)](https://react.dev/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb)](https://mongodb.com/)
 
 ---
 
-## Installation & Setup
+## 🔗 Live Demo
+
+| Portal | URL |
+|---|---|
+| 🧖 Customer Portal | https://aura-time-blond.vercel.app/ |
+| 🛠️ Admin / Staff Portal | https://aura-time-admin.vercel.app/ |
+| ⚙️ Backend API | https://auratime.onrender.com |
+
+**Demo Credentials:**
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@auratime.com | SuperSecure!1 |
+| Staff | staff@auratime.com | Passowrd@1234 |
+| Customer | customer@auratime.com | Customer@1234! |
+
+---
+
+## 🧩 Problem & Solution
+
+Beauty and wellness SMEs often lose bookings and revenue to manual scheduling — phone calls, paper diaries, double bookings, and no visibility into business performance.
+
+AuraTime solves this with a three-portal system: customers book online in real time, staff manage their own schedules, and admins get full oversight of the business — all in one platform.
+
+---
+
+## ⚙️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React, Vite |
+| Backend | Node.js, Express |
+| Database | MongoDB (Atlas) |
+| Auth | JWT (role-based: Admin / Staff / Customer) |
+| Payments | Stripe |
+| File Storage | Cloudinary |
+| Deployment | Vercel (frontend), Render (backend) |
+
+---
+
+## 🔑 Key Engineering Decisions
+
+- **Role-based JWT authentication** — three distinct user roles (Admin, Staff, Customer) with protected routes and scoped access at the API level.
+- **Real-time availability engine** — booking slots update dynamically based on staff schedules, preventing double bookings without manual intervention.
+- **Stripe payment integration** — end-to-end checkout flow with server-side payment intent creation for secure transaction handling.
+- **Cloudinary for media** — offloaded image management entirely to Cloudinary to keep the backend stateless and storage-agnostic.
+- **Separated frontend architecture** — Customer and Admin portals are deployed as independent Vite apps, sharing a single Express API, making both easier to maintain and scale independently.
+
+---
+
+## ✨ Features
+
+### Customer Portal
+- Browse services and book appointments with live availability
+- Secure registration and JWT-authenticated sessions
+- View, reschedule, and cancel upcoming appointments
+- Stripe-powered payment checkout
+- Leave ratings and reviews for completed services
+
+### Staff Portal
+- Personalised dashboard with daily schedule overview
+- Interactive calendar for managing personal availability
+- Create walk-in appointments manually for in-person customers
+- Automated reminders for upcoming sessions
+- Access to customer feedback and performance ratings
+
+### Admin Portal
+- Manage users, staff, and role assignments
+- Configure and price services
+- Monitor all bookings, cancellations, and system activity
+- Revenue dashboard with real-time financial tracking
+- Generate reports on booking trends and staff performance
+
+---
+
+## 🏗️ Architecture
+
+```
+AuraTime/
+├── Backend/        # Node.js + Express REST API
+├── Frontend/       # React + Vite — Customer Portal
+└── Admin/          # React + Vite — Admin & Staff Portal
+```
+
+**Production Infrastructure:**
+- **Frontend/Admin** — Vercel with automatic Git deployments
+- **Backend** — Render with environment variable configuration
+- **Database** — MongoDB Atlas (cloud-hosted)
+- **Security** — Helmet headers, rate limiting, Gzip compression, SSL/TLS via Vercel & Render
+
+---
+
+## 🚀 Local Setup
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (local installation or Atlas account)
-- Stripe account (for payment processing)
-- Cloudinary account (for image uploads)
-- Git
+- Node.js v18+
+- MongoDB (local or Atlas)
+- Stripe account
+- Cloudinary account
 
-### Clone the Repository
+### 1. Clone
+
 ```bash
 git clone https://github.com/Chungu13/AuraTime.git
 cd AuraTime
 ```
 
-### 1. Backend Setup
+### 2. Backend
 
-Navigate to the `Backend` directory:
 ```bash
 cd Backend
 npm install
 ```
 
-Create a `.env` file 
+Create a `.env` file:
 
-Update the `.env` file with your credentials:
 ```env
 MONGODB_URI=your_mongodb_connection_string
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -113,14 +136,12 @@ JWT_SECRET=your_jwt_secret
 PORT=4000
 ```
 
-Start the server:
 ```bash
-# Development (requires nodemon)
 npm run server
+```
 
-### 2. Frontend Setup (Customer Portal)
+### 3. Customer Portal
 
-Navigate to the `Frontend` directory (from project root):
 ```bash
 cd Frontend
 npm install
@@ -128,21 +149,16 @@ npm install
 
 Create a `.env` file:
 
-
-Configure the backend URL:
 ```env
 VITE_BACKEND_URL=http://localhost:4000
 ```
 
-Start the development server:
 ```bash
 npm run dev
 ```
 
+### 4. Admin Portal
 
-### 3. Admin Portal Setup
-
-Navigate to the `Admin` directory (from project root):
 ```bash
 cd Admin
 npm install
@@ -150,44 +166,24 @@ npm install
 
 Create a `.env` file:
 
-
-Configure the backend URL:
 ```env
 VITE_BACKEND_URL=http://localhost:4000
 ```
 
-Start the development server:
 ```bash
 npm run dev
 ```
 
+### 5. Access
 
-### 4. Access the Application
-
-Once all services are running:
-- **Customer Portal:** http://localhost:3000 (or your Vite dev port)
-- **Admin Portal:** http://localhost:5174 (or your Vite dev port)
-- **Backend API:** http://localhost:4000
-
----
-
-## 📦 Deployment Architecture
-
-**Current Production Stack:**
-- **Frontend/Admin:** Deployed on Vercel with automatic deployments from Git
-- **Backend:** Hosted on Render with environment variables configured
-- **Database:** MongoDB Atlas (cloud-hosted)
-- **File Storage:** Cloudinary for images
-- **Payments:** Stripe (live/test mode)
-
-**Key Production Configurations:**
-- CORS configured for Vercel frontend origins
-- Rate limiting enabled on API endpoints
-- Helmet security headers active
-- Gzip compression enabled
-- SSL/TLS via Vercel and Render
+| Service | URL |
+|---|---|
+| Customer Portal | http://localhost:3000 |
+| Admin Portal | http://localhost:5174 |
+| Backend API | http://localhost:4000 |
 
 ---
 
+## 📌 About
 
- 
+Developed as a final year project to explore full-stack development, role-based authentication patterns, third-party API integration (Stripe, Cloudinary), and deployment of multi-service web applications.
