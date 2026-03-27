@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react"; // Syncing directory casing
+import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 

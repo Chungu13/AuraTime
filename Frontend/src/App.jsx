@@ -15,6 +15,7 @@ import { AppContext } from "./context/AppContext";
 import axios from "axios";
 import TopLoadingBar from "./components/TopLoadingBar";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 import FeedbackForm from "./pages/MyFeedback"
 
 import ForgotPassword from "./pages/ForgotPassword";
@@ -77,6 +78,7 @@ const App = () => {
           <Route path="/my-feedback" element={<FeedbackForm />} />
           <Route path="*" element={<div>Not found</div>} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
 
           <Route path="/Forgot-Password" element={<ForgotPassword />}></Route>
 

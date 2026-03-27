@@ -354,7 +354,7 @@ const bookAppointment = async (req, res) => {
         },
       ],
       success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}&payment_type=${paymentType}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel?staffId=${staffId}&slotDate=${slotDate}&slotTime=${slotTime}`,
       metadata: {
         staffId,
         userId,
@@ -575,6 +575,36 @@ const submitFeedback = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Server error. Please try again." });
+  }
+};
+
+const releaseSlot = async (req, res) => {
+  try {
+    const { staffId, slotDate, slotTime } = req.body;
+
+    const businessData = await businessModel.findById(staffId);
+    if (!businessData) {
+      return res.json({ success: false, message: "Staff not found" });
+    }
+
+    let slots_booked = businessData.slots_booked || {};
+    
+    const getDateKey = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toISOString().split("T")[0];
+    };
+    
+    const dateKey = getDateKey(slotDate);
+
+    if (slots_booked[dateKey]) {
+      slots_booked[dateKey] = slots_booked[dateKey].filter(e => e !== slotTime);
+      await businessModel.findByIdAndUpdate(staffId, { slots_booked });
+    }
+
+    res.json({ success: true, message: "Slot released successfully" });
+  } catch (error) {
+    console.error("Release slot error:", error);
+    res.json({ success: false, message: error.message });
   }
 };
 
@@ -824,6 +854,7 @@ export {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  releaseSlot,
   deleteHistory,
   clearAllHistory,
   submitFeedback,

@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, ArrowRight } from "lucide-react";
 
 const PaymentSuccess = () => {
   const { backendUrl } = useContext(AppContext);
-  const [status, setStatus] = useState("verifying"); // verifying, success, error
+  const [status, setStatus] = useState("verifying");
   const [message, setMessage] = useState("Verifying your payment...");
   const navigate = useNavigate();
 

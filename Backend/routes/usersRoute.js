@@ -12,6 +12,7 @@ import {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  releaseSlot,
   deleteHistory, // Delete a single appointment
   clearAllHistory,
   submitFeedback,
@@ -39,6 +40,7 @@ userRouter.post("/update-profile", upload.single("image"), authUser, updateProfi
 userRouter.post("/book-appointment", authUser, bookAppointment);
 userRouter.get("/appointments", authUser, listAppointment);
 userRouter.post("/cancel-appointment", authUser, cancelAppointment);
+userRouter.post("/release-slot", releaseSlot);
 userRouter.post("/delete-history", authUser, deleteHistory);
 userRouter.post("/clear-all-history", authUser, clearAllHistory);
 
