@@ -1,6 +1,6 @@
-# AuraTime — Appointment Management for Beauty & Wellness
+# AuraTime - Appointment Management for Beauty & Wellness
 
-> A full-stack booking platform that helps beauty and wellness SMEs replace manual scheduling with automated online appointment management.
+> A full-stack booking platform built for a beauty and wellness business - replacing manual scheduling with automated online appointment management.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Customer%20Portal-brightgreen)](https://aura-time-blond.vercel.app/)
 [![Admin Portal](https://img.shields.io/badge/Live%20Demo-Admin%20Portal-blue)](https://aura-time-admin.vercel.app/)
@@ -10,7 +10,7 @@
 
 ---
 
-## 🔗 Live Demo
+##  Live Demo
 
 | Portal | URL |
 |---|---|
@@ -38,15 +38,15 @@
 
 ---
 
-## 🧩 Problem & Solution
+## Problem & Solution
 
-Beauty and wellness SMEs often lose bookings and revenue to manual scheduling — phone calls, paper diaries, double bookings, and no visibility into business performance.
+Beauty and wellness businesses often lose bookings and revenue to manual scheduling — phone calls, paper diaries, double bookings, and no visibility into business performance.
 
-AuraTime solves this with a three-portal system: customers book online in real time, staff manage their own schedules, and admins get full oversight of the business — all in one platform.
+AuraTime is a booking system built for Glow & Radiance Spa, a fictional beauty and wellness business, to simulate this real-world problem. It solves it with a three-portal system: customers book online in real time, front desk staff manage day-to-day appointments, and the admin has full oversight of the business — all in one platform.
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -60,13 +60,13 @@ AuraTime solves this with a three-portal system: customers book online in real t
 
 ---
 
-## 🔑 Key Engineering Decisions
+## Key Engineering Decisions
 
-- **Role-based JWT authentication** — three distinct user roles (Admin, Staff, Customer) with protected routes and scoped access at the API level.
-- **Real-time availability engine** — booking slots update dynamically based on staff schedules, preventing double bookings without manual intervention.
-- **Stripe payment integration** — end-to-end checkout flow with server-side payment intent creation for secure transaction handling.
-- **Cloudinary for media** — offloaded image management entirely to Cloudinary to keep the backend stateless and storage-agnostic.
-- **Separated frontend architecture** — Customer and Admin portals are deployed as independent Vite apps, sharing a single Express API, making both easier to maintain and scale independently.
+- **Role-based JWT authentication** - three distinct user roles (Admin, Staff, Customer) with protected routes and scoped access at the API level.
+- **Real-time availability engine** - booking slots update dynamically based on staff schedules, preventing double bookings without manual intervention.
+- **Stripe payment integration** - end-to-end checkout flow with server-side payment intent creation for secure transaction handling.
+- **Cloudinary for media** - offloaded image management entirely to Cloudinary to keep the backend stateless and storage-agnostic.
+- **Separated frontend architecture** - Customer and Admin portals are deployed as independent Vite apps, sharing a single Express API, making both easier to maintain and scale independently.
 
 ---
 
@@ -81,7 +81,7 @@ AuraTime solves this with a three-portal system: customers book online in real t
 - Stripe-powered payment checkout
 - Leave ratings and reviews for completed services
 
-### 🗂️ Front Desk Staff — Day-to-day operations
+### 🗂️ Front Desk Staff -  Day-to-day operations
 - View and manage all upcoming appointments
 - Create walk-in bookings for in-person customers
 - Handle reschedules and cancellations on behalf of customers
@@ -106,10 +106,10 @@ AuraTime/
 ```
 
 **Production Infrastructure:**
-- **Frontend/Admin** — Vercel with automatic Git deployments
-- **Backend** — Render with environment variable configuration
-- **Database** — MongoDB Atlas (cloud-hosted)
-- **Security** — Helmet headers, rate limiting, Gzip compression, SSL/TLS via Vercel & Render
+- **Frontend/Admin** -  Vercel with automatic Git deployments
+- **Backend** - Render with environment variable configuration
+- **Database** - MongoDB Atlas (cloud-hosted)
+- **Security** - Helmet headers, rate limiting, Gzip compression, SSL/TLS via Vercel & Render
 
 ---
 
@@ -197,4 +197,4 @@ npm run dev
 
 ## 📌 About
 
-Developed as a final year project to explore full-stack development, role-based authentication patterns, third-party API integration (Stripe, Cloudinary), and deployment of multi-service web applications.
+Developed as a final year project for Glow & Radiance Spa, a fictional beauty and wellness business, to simulate a real-world booking problem. Built to explore full-stack development, role-based authentication, third-party API integration (Stripe, Cloudinary), and deployment of multi-service web applications.
