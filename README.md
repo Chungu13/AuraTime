@@ -40,9 +40,9 @@
 
 ## Problem & Solution
 
-Beauty and wellness businesses often lose bookings and revenue to manual scheduling — phone calls, paper diaries, double bookings, and no visibility into business performance.
+Beauty and wellness businesses often lose bookings and revenue to manual scheduling - phone calls, paper diaries, double bookings, and no visibility into business performance.
 
-AuraTime is a booking system built for Glow & Radiance Spa, a fictional beauty and wellness business, to simulate this real-world problem. It solves it with a three-portal system: customers book online in real time, front desk staff manage day-to-day appointments, and the admin has full oversight of the business — all in one platform.
+AuraTime is a booking system built for Glow & Radiance Spa, a fictional beauty and wellness business, to simulate this real-world problem. It solves it with a three-portal system: customers book online in real time, front desk staff manage day-to-day appointments, and the admin has full oversight of the business - all in one platform.
 
 ---
 
