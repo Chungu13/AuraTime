@@ -30,7 +30,9 @@
 
 ## 🎥 Demo
 
-[![AuraTime Demo](https://www.loom.com/share/44e3c1e6558d4cbe9e547bdc549110a8)
+[![AuraTime Demo]
+
+https://www.loom.com/share/44e3c1e6558d4cbe9e547bdc549110a8
 
 > Covers the customer booking flow and how real-time availability prevents double bookings across concurrent sessions.
 
