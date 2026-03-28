@@ -30,11 +30,11 @@
 
 ## 🎥 Demo
 
-[![AuraTime Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[![AuraTime Demo](https://www.loom.com/share/44e3c1e6558d4cbe9e547bdc549110a8)
 
-> Covers the full customer booking flow and how real-time availability prevents double bookings across concurrent sessions.
+> Covers the customer booking flow and how real-time availability prevents double bookings across concurrent sessions.
 
-*Replace `YOUR_VIDEO_ID` with your YouTube/Loom video ID before publishing.*
+
 
 ---
 
